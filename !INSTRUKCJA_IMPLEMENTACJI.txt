@@ -1,0 +1,59 @@
+WAŻNE INFORMACJE: !!! Poniższej instrukcji oraz wszelkich plików otrzymanych na priv, bądź z platformy Transifex nie wolno nigdzie, ani nikomu udostępniać (innym Tłumaczom również nie). Są to wersje do prywatnego użytku lub testów. 
+---
+
+Instrukcja implementacji spolszczenia do gry Pathfinder Wrath of the Righteous:
+I. Sprawdzenie numeru wersji gry i pobieranie zaimplementowanych czcionek zawierających polskie znaki.
+   I.1. Uruchamiamy grę i po wczytaniu menu głównego w lewym dolnym rogu ekranu sprawdzamy numer wersji gry, którą posiadamy aktualnie zainstalowaną.
+   I.2. Po sprawdzeniu i zapamiętaniu numeru wersji zamykamy grę.
+   I.3. Na serwerze Discord projektu na kanale #czcionki-w-grze odnajdujemy zaimplementowane polskie fonty konkretnie dla naszego numeru wersji gry i je pobieramy.
+		UWAGA!: Jeśli aktualnie na kanale nie udostępniono polskich fontów dla naszego numeru wersji gry to możemy awaryjnie zaimplementować spolszczenie nie zawierające polskich znaków (czytaj dalej).
+		INFORMACJA DODATKOWA: Polskie fonty dla nowszych wersji gry zazwyczaj są przygotowywane i udostępniane na kanale Discord #czcionki-w-grze do kilku dni od czasu wydania patcha przez Owlcat.
+   I.4. Przechodzimy do folderu "<folder_główny_PWR>\Wrath_Data\" i tworzymy kopię bezpieczeństwa oryginalnego pliku gry "sharedassets0.assets" zmieniając jego nazwę na "sharedassets0.assets.ORIG.BAK".
+
+
+II. Pobieranie aktualnego spolszczenia z platformy Transifex.com:
+	I.1. Logujemy się na platformie transifex.com na nasze konto, które ma dostęp do projektu. Z menu po lewej wybieramy "PWR - Korekta tłumaczenia"/Zasoby, a następnie wchodzimy w 	"enGB-1.0.1c-ORIG.json.stringsTransifexCOM.txt"/"Polish (pl)".
+	II.2. W nowootwartym okienku wybieramy z lewej strony "Pobierz do użycia", czekamy aż plik się wygeneruje i go pobieramy. 
+	INFORMACJA: Transifex generuje zawsze najświeższy plik zawierający wszystkie dokonane do tej pory zmiany w lokalizacji i jest aktualny na daną chwilę.
+
+III. Konwertowanie spolszczenia dla formatu obsługiwanego przez grę przy użyciu otrzymanego narzędzia:
+	 III.1. Otrzymane na priv narzędzie "nazwa_użytkownika_PWRlangConverter-e1p_Windows.zip" rozpakowujemy (najlepiej na dysk "C:\") i przenosimy pobrany wcześniej plik z platformy transifex o nazwie "for_use_PWR_PL_engb-101c-origjsonstringstransifexcomtxt_pl.txt" do folderu z otrzymanym programem.
+	 III.2. Uruchamiamy plik "PWRlangConverter.exe" (jeśli plik się nie uruchamia to musimy zainstalować .NET Runtime w wersji przynajmniej 5.0.2 - link znajduje się w pliku "!info-Windows.txt" w folderze z narzędziem).
+	 III.3. Wybieramy opcję nr. 1, klikamy enter.
+	 III.4. Czekamy aż operacje się zakończą i jeśli nie wykryto błędów możemy przejść dalej - klikamy enter. UWAGA!: Jeśli jakiekolwiek błędy zostaną wykryte to przed próbą implementacji proszę kontaktować się z Revokiem na Discordzie.
+	 III.5. Otwieramy ponownie narzędzie "PWRlangConverter.exe", ale tym razem wybieramy opcję nr. 2 i klikamy enter.
+	 III.6. W następnym kroku wybieramy 1 i klikamy enter jeśli chcemy aby numery linii zostały dołączone do pliku lokalizacji lub wybieramy 2 i klikamy enter aby dołączyć dodatkowo identyfikatory, które ułatwią przefiltrowanie i odnalezienie konkretnej linii na platformie Transifex (w tym celu wystarczy w edytorze Transifex wpisać wyszukiwaną frazę zawierająca identyfikator linii ujęty między nawiasami <>, np.: "<100>").
+	 III.7. Operacje mogą potrwać (w zależności od bardzo wielu czynników) 1-10 minut.
+	 III.8. Gdy operacje się zakończą otrzymamy komunikat o nowo wygenerowanym pliku json, który zostanie zapisany w tym samym folderze co narzędzie.
+
+	 UWAGA!: Punkty III.9 i III.10 stosujemy tylko, gdy na kanale Discord nie znaleźliśmy zaimplementowanych polskich fontów dla naszego numeru wersji gry. 
+	 (III.9). Otwieramy ponownie narzędzie "PWRlangConverter.exe", wybieramy opcję nr. 3 i klikamy enter.
+	 (III.10). Czekamy aż operacje się zakończą i jeśli operacja przebiegła pomyślnie - klikamy enter, aby zamknąć program. Nasz nowy plik został zapisany w folderze z programem pod nazwą rozpoczynającą się od "BezZnakowPL_NOWY_".
+
+IV. Instalacja spolszczenia:
+	IV.1. Przechodzimy do folderu: "<folder_główny_PWR>\Wrath_Data\StreamingAssets\Localization\" i robimy kopię bezpieczeństwa oryginalnego pliku gry "deDE.json" zmieniając jego nazwę na "deDE.json.ORIG.BAK".
+	IV.2. Nasz nowy wygenerowany plik polskiej lokalizacji znajduje się w folderze z otrzymanym narzędziem (jego nazwa rozpoczyna się od "NOWY_" lub "BezZnakowPL_NOWY_"). Zmieniamy jego nazwę na "deDE.json" i przenosimy do folderu: "<folder_główny_PWR>\Wrath_Data\StreamingAssets\Localization\"
+	IV.3. [TEN PUNKT POMIJAMY JEŚLI NIE ZNALEŹLIŚMY NA KANALE DISCORD POLSKICH FONTÓW DLA NASZEGO NUMERU WERSJI GRY] Rozpakowujemy archiwum z pobranymi wczęsniej zaimplementowanymi polskimi czcionkami dla naszego numeru wersji gry i plik sharedassets0.assets przenosimy do: "<folder_główny_PWR>\Wrath_Data\"
+	IV.4. Uruchamiamy grę i w opcjach przełączamy język na niemiecki (Options\Language\"Deutsch") oraz uruchamiamy grę ponownie.
+
+
+V. Odinstalowanie spolszczenia:
+   WAŻNE: Odinstalowanie spolszczenia jest wymagane przed każdą aktualizacją gry w kliencie Steam/GOG, aby nie było konieczności za każdym razem przeprowadzać weryfikacji spójności plików gry. Jeśli zauważyliśmy, że nowy patch rozpoczął się pobierać w Steam/GOG - to zatrzymujemy jego pobieranie (zanim zdąży się pobrać i zainstalować), zamykamy Steam/GOG i wtedy odinstalowujemy spolszczenie.
+   V.1. Usuwamy następujące pliki:
+		- "<folder_główny_PWR>\Wrath_Data\sharedassets0.assets"
+		- "<folder_główny_PWR>\Wrath_Data\StreamingAssets\Localization\deDE.json"
+   V.2. Przywracamy oryginalne pliki gry z kopii bezpieczeństwa zmieniając nazwy następujących plików:
+		- Zmieniamy nazwę pliku o nazwie "sharedassets0.assets.ORIG.BAK" na "sharedassets0.assets" w: "<folder_główny_PWR>\Wrath_Data\"
+		- Zmieniamy nazwę pliku o nazwie "deDE.json.ORIG.BAK" na "deDE.json" w: "<folder_główny_PWR>\Wrath_Data\StreamingAssets\Localization\"
+   WAŻNE#2: Teraz możemy zaktualizować grę w Steam/GOG, a następnie spolszczenie możemy ponownie zainstalować wykonująć czynności opisane w rozdziałach I-IV.
+   
+VI. [AWARYJNE ROZWIĄZANIE] Odinstalowanie spolszczenia/przywrócenie oryginalnych plików gry:
+	INFORMACJA: Jeśli mieliśmy zainstalowane spolszczenie oraz nie zauważyliśmy, że gra została zaktualizowana lub nie zdążyliśmy zatrzymać pobierania lub instalacji patcha w kliencie Steam/GOG to wykonujemy opisane tutaj czynności
+	INFORMACJA: Jeśli gra zawiesza się przy uruchamianiu (czarny ekran), zawiesza się podczas wczytywania (pasek wczytywania) lub nie chce się uruchomić to wykonujemy opisane tutaj czynności
+	VI.1. Usuwamy pliki:
+		  - "<folder_główny_PWR>\Wrath_Data\sharedassets0.assets.ORIG.BAK"
+		  - "<folder_główny_PWR>\Wrath_Data\StreamingAssets\Localization\deDE.json.ORIG.BAK"
+	VI.2. W kliencie Steam/GOG przeprowadzamy weryfikację spójności plików gry
+	WAŻNE: Teraz spolszczenie możemy ponownie zainstalować wykonująć czynności opisane w rozdziałach I-IV.
+
+W razie problemów proszę o kontakt ze mną na priv (Revok#8403) na Discordzie.

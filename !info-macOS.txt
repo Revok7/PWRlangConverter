@@ -1,0 +1,10 @@
+Uruchomienie programu:
+1. Otwieramy terminal i przechodzimy do katalogu z rozpakowanego archiwum:
+cd Downloads/PWRlangConverter_macOS
+
+2. Nadajemy uprawnienia dla pliku PWRlangConevrter poleceniem:
+chmod 775 PWRlangConverter
+
+3. Uruchamiamy program w terminalu poleceniem:
+./PWRlangConverter
+

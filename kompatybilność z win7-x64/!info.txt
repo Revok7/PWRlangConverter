@@ -1,0 +1,1 @@
+Aby móc uruchomić edycję e1ps aplikacji PWRlangConverter w systemie operacyjnym Windows 7 x64 bez zainstalowanego .NET Runtime 6.0 to należy skopiować bibliotekę "api-ms-win-core-winrt-l1-1-0.dll" do folderu z programem "PWRlangConverter".

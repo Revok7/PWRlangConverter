@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ApplicationIcon>iconfinder_Unity_3D_617623.ico</ApplicationIcon>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Configurations>Debug;Release;test</Configurations>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="6.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Goblinfactory.ProgressBar.moddedbyRevok">
+      <HintPath>..\biblioteki\Goblinfactory.ProgressBar.moddedbyRevok.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd &quot;C:\Users\revok\Documents\Visual Studio 2022\Revok-projekty\C#\PWRlangConverter\&quot;&#xD;&#xA;start Zdarzenia_po_kompilacji.cmd" />
+  </Target>
+
+</Project>

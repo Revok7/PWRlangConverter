@@ -1,0 +1,15 @@
+Program "PWRlangConverter" do prawidłowego uruchomienia i działania wymaga zainstalowania w systemie .NET Runtime w wersji przynajmniej 5.0.2:
+https://docs.microsoft.com/pl-pl/dotnet/core/install/linux
+
+
+Uruchomienie programu:
+1. Otwieramy terminal i przechodzimy do katalogu z rozpakowanego archiwum:
+cd PWRlangConverter_Linux-x64
+
+2. Nadajemy prawa do wykonywania dla pliku "PKlangConverter":
+chmod 775 ./PWRlangConverter
+
+3. Uruchamiamy program w terminalu poleceniem:
+./PWRlangConverter
+
+
