@@ -21,8 +21,10 @@ namespace PWRlangConverter
     {
         public string autoWprowadzanieNazwPlikowWejsciowych { get; set; }
         public string domyslnaNazwaPlikuTXTZTransifexCOM { get; set; }
+        public string domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM { get; set; }
         public string domyslnaNazwaPlikukeysTransifexCOMTXT { get; set; }
         public string domyslnaNazwaPlikustringsTransifexCOMTXT { get; set; }
+        public string domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT { get; set; }
         public string domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON { get; set; }
 
         const string skrypt = "konfiguracja.cs";
@@ -39,9 +41,11 @@ namespace PWRlangConverter
 
                 plikCFGdomyslny_sw.WriteLine("      \"autoWprowadzanieNazwPlikowWejsciowych\": \"0\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTZTransifexCOM\": \"\",");
+                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikukeysTransifexCOMTXT\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikustringsTransifexCOMTXT\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON\": \"\",");
+                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT\": \"\",");
 
                 plikCFGdomyslny_sw.WriteLine("      \"__domyslnyPlikKonfiguracyjny\": \"1\"");
                 plikCFGdomyslny_sw.WriteLine("}");

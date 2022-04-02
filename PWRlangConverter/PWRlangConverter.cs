@@ -231,7 +231,7 @@ namespace PWRlangConverter
 
                 string numer_operacji_string;
 
-                Console.WriteLine("PWRlangConverter v.1.54 by Revok (2022)");
+                Console.WriteLine("PWRlangConverter v.1.6 by Revok (2022)");
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("---------------------------------------");
@@ -251,11 +251,11 @@ namespace PWRlangConverter
 
                     if (numer_operacji_int == 1)
                     {
-                        StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach();
+                        WeryfikacjaPlikowMetadanych("StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach");
                     }
                     else if (numer_operacji_int == 2)
                     {
-                        TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON();
+                        WeryfikacjaPlikowMetadanych("TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON");
                     }
                     else if (numer_operacji_int == 3)
                     {
@@ -450,7 +450,179 @@ namespace PWRlangConverter
             }
         }
 
-        private static void StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach()
+        public static void WeryfikacjaPlikowMetadanych(string nazwa_metody_ktora_ma_zostac_uruchomiona)
+        {
+            Console.WriteLine("1. #1_1.0.1c");
+
+            string folderupdate = folderglownyprogramu + "//" + "update";
+            string przyrostek_UpdateLocStruct = ".UpdateLocStruct.json";
+            string przyrostek_UpdateLog = ".UpdateLog.json";
+            string przyrostek_UpdateSchema = ".UpdateSchema.json";
+
+            List<string> lista_oznaczen_aktualizacji = new List<string>();
+
+            if (Directory.Exists(folderupdate) == true)
+            {
+                List<string> istniejacenazwyplikowmetadanych = PobierzNazwyPlikowJSONzFolderu("update");
+
+                int np = 2;
+                for (int i = 0; i < istniejacenazwyplikowmetadanych.Count; i++)
+                {
+                    //Console.WriteLine("Nazwa pliku metadanych: " + istniejacenazwyplikowmetadanych[i]);
+
+                    if (istniejacenazwyplikowmetadanych[i].Contains(przyrostek_UpdateSchema) == true)
+                    {
+                        string oznaczenie_aktualizacji = istniejacenazwyplikowmetadanych[i].Split(new string[] { ".Update" }, StringSplitOptions.None)[0];
+
+                        //Console.WriteLine("Oznaczenie aktualizacji: " + oznaczenie_aktualizacji);
+
+                        if (File.Exists(folderupdate + "//" + oznaczenie_aktualizacji + przyrostek_UpdateLocStruct) == true
+                            && File.Exists(folderupdate + "//" + oznaczenie_aktualizacji + przyrostek_UpdateLog) == true
+                            && File.Exists(folderupdate + "//" + oznaczenie_aktualizacji + przyrostek_UpdateSchema) == true)
+                        {
+                            lista_oznaczen_aktualizacji.Add(oznaczenie_aktualizacji);
+
+                            Console.WriteLine(np + ". " + oznaczenie_aktualizacji.Replace("-", "->"));
+
+                            np++;
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+
+            string numer_pozycji_string;
+            Console.Write("Wpisz numer pozycji, której konwersja ma dotyczyć: ");
+            numer_pozycji_string = Console.ReadLine();
+
+            if (CzyParsowanieINTUdane(numer_pozycji_string))
+            {
+                string domyslna_nazwaplikukeysTransifexCOMTXT = "";
+                string domyslna_nazwaplikustringsTransifexCOMTXT = "";
+
+
+                int numer_pozycji_int = int.Parse(numer_pozycji_string);
+
+                if (numer_pozycji_int == 1)
+                {
+
+                    //Console.WriteLine("DBG: Wybrano domyślny plik (czyli pozycję nr.: " + numer_pozycji_string + ").");
+
+                    if (nazwa_metody_ktora_ma_zostac_uruchomiona == "StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach")
+                    {
+                        if (cfg.autoWprowadzanieNazwPlikowWejsciowych == "1")
+                        {
+                            domyslna_nazwaplikustringsTransifexCOMTXT = cfg.domyslnaNazwaPlikuTXTZTransifexCOM;
+                        }
+                        else
+                        {
+                            domyslna_nazwaplikustringsTransifexCOMTXT = "";
+                        }
+
+                        StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach(domyslna_nazwaplikustringsTransifexCOMTXT);
+
+                    }
+                    else if (nazwa_metody_ktora_ma_zostac_uruchomiona == "TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON")
+                    {
+                        if (cfg.autoWprowadzanieNazwPlikowWejsciowych == "1")
+                        {
+                            domyslna_nazwaplikukeysTransifexCOMTXT = cfg.domyslnaNazwaPlikukeysTransifexCOMTXT;
+                            domyslna_nazwaplikustringsTransifexCOMTXT = cfg.domyslnaNazwaPlikuTXTZTransifexCOM;
+                        }
+                        else
+                        {
+                            domyslna_nazwaplikukeysTransifexCOMTXT = "";
+                            domyslna_nazwaplikustringsTransifexCOMTXT = "";
+                        }
+
+                        TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON(domyslna_nazwaplikukeysTransifexCOMTXT, domyslna_nazwaplikustringsTransifexCOMTXT);
+
+
+                    }
+                }
+                else if (numer_pozycji_int > 1)
+                {
+                    int indeks_oznaczeniaaktualizacji = (numer_pozycji_int) - 2;
+
+                    if ((indeks_oznaczeniaaktualizacji >= 0) && (lista_oznaczen_aktualizacji.Count - 1 >= indeks_oznaczeniaaktualizacji))
+                    {
+                        //Console.WriteLine("DBG: Wybrano plik aktualizacji (a konkretnie pozycję nr.: " + numer_pozycji_string + ").");
+
+                        if (cfg.autoWprowadzanieNazwPlikowWejsciowych == "1")
+                        {
+                            string[] tmp1_loa = lista_oznaczen_aktualizacji[indeks_oznaczeniaaktualizacji].Split(new char[] { '_' });
+
+                            if (tmp1_loa.Length >= 2)
+                            {
+                                string numerporzadkowy_aktualizacji = tmp1_loa[0];
+                                string oznaczenie_aktualizacji = tmp1_loa[1];
+
+                                domyslna_nazwaplikukeysTransifexCOMTXT = cfg.domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT
+                                .Replace("%OZNACZENIE_AKTUALIZACJI%", oznaczenie_aktualizacji)
+                                ;
+
+                                domyslna_nazwaplikustringsTransifexCOMTXT = cfg.domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM
+                                .Replace("%NUMER_PORZADKOWY_AKTUALIZACJI%", numerporzadkowy_aktualizacji.Replace("#", ""))
+                                .Replace("%OZNACZENIE_AKTUALIZACJI%", oznaczenie_aktualizacji.Replace(".", ""))
+                                ;
+                            }
+                            else
+                            {
+                                Blad("Wykryto przynajmniej jedną nieprawidłowość w nazwach plików metadanych aktualizacji.");
+
+                                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                                Console.ReadKey();
+                            }
+                        }
+                        else
+                        {
+                            domyslna_nazwaplikukeysTransifexCOMTXT = "";
+                            domyslna_nazwaplikustringsTransifexCOMTXT = "";
+                        }
+
+                        if (nazwa_metody_ktora_ma_zostac_uruchomiona == "StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach")
+                        {
+                            StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach(domyslna_nazwaplikustringsTransifexCOMTXT);
+                        }
+                        else if (nazwa_metody_ktora_ma_zostac_uruchomiona == "TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON")
+                        {
+                            TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON(domyslna_nazwaplikukeysTransifexCOMTXT, domyslna_nazwaplikustringsTransifexCOMTXT);
+                        }
+
+                    }
+                    else
+                    {
+                        Blad("Podano błędny numer pozycji. (#3)");
+
+                        Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                        Console.ReadKey();
+                    }
+                }
+                else
+                {
+                    Blad("Podano błędny numer pozycji. (#2)");
+
+                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                    Console.ReadKey();
+                }
+
+            }
+            else
+            {
+                Blad("Podano błędny numer pozycji. (#1)");
+
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
+            }
+
+
+        }
+
+        private static void StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach(string domyslna_nazwaplikustringsTransifexCOMTXT)
         {
             bool nie_wyswietlaj_komunikatu_o_sukcesie = false;
 
@@ -460,7 +632,7 @@ namespace PWRlangConverter
 
             if (cfg.autoWprowadzanieNazwPlikowWejsciowych == "1")
             {
-                nazwaplikustringsTransifexCOMTXT = cfg.domyslnaNazwaPlikuTXTZTransifexCOM;
+                nazwaplikustringsTransifexCOMTXT = domyslna_nazwaplikustringsTransifexCOMTXT;
 
             }
             else
@@ -600,8 +772,7 @@ namespace PWRlangConverter
 
         }
 
-
-        public static void TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON()
+        public static void TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON(string domyslna_nazwaplikuaktualizacjikeysTransifexCOMTXT, string domyslna_nazwaplikuaktualizacjistringsTransifexCOMTXT)
         {
             /* USUWANIE FOLDERU TMP WRAZ Z ZAWARTOŚCIĄ (JEŚLI ISTNIEJE) - POCZĄTEK */
             if (Directory.Exists(nazwafolderutmp) == true)
@@ -622,20 +793,9 @@ namespace PWRlangConverter
 
             if (cfg.autoWprowadzanieNazwPlikowWejsciowych == "1")
             {
-                //Console.WriteLine("[DEBUG] cfg.domyslnaNazwaPlikukeysTransifexCOMTXT: " + cfg.domyslnaNazwaPlikukeysTransifexCOMTXT);
-                //Console.WriteLine("[DEBUG] cfg.domyslnaNazwaPlikuTXTZTransifexCOM: " + cfg.domyslnaNazwaPlikuTXTZTransifexCOM);
-                //Console.WriteLine("[DEBUG] cfg.domyslnaNazwaPlikustringsTransifexCOMTXT: " + cfg.domyslnaNazwaPlikustringsTransifexCOMTXT);
+                nazwaplikukeystxt = domyslna_nazwaplikuaktualizacjikeysTransifexCOMTXT;
 
-                nazwaplikukeystxt = cfg.domyslnaNazwaPlikukeysTransifexCOMTXT;
-
-                if (File.Exists(cfg.domyslnaNazwaPlikustringsTransifexCOMTXT) == true) { File.Delete(cfg.domyslnaNazwaPlikustringsTransifexCOMTXT); }
-
-                if (File.Exists(cfg.domyslnaNazwaPlikuTXTZTransifexCOM) == true) { File.Copy(cfg.domyslnaNazwaPlikuTXTZTransifexCOM, cfg.domyslnaNazwaPlikustringsTransifexCOMTXT); }
-
-                nazwaplikustringstxt = cfg.domyslnaNazwaPlikustringsTransifexCOMTXT;
-
-
-
+                nazwaplikustringstxt = domyslna_nazwaplikuaktualizacjistringsTransifexCOMTXT;
             }
             else
             {
@@ -900,7 +1060,7 @@ namespace PWRlangConverter
                     {
                         if (cfg.autoWprowadzanieNazwPlikowWejsciowych == "1")
                         {
-                            if (File.Exists(cfg.domyslnaNazwaPlikuTXTZTransifexCOM) == true) { File.Delete(cfg.domyslnaNazwaPlikuTXTZTransifexCOM); }
+                            if (File.Exists(nazwaplikustringstxt) == true) { File.Delete(nazwaplikustringstxt); }
                             if (File.Exists(cfg.domyslnaNazwaPlikustringsTransifexCOMTXT) == true) { File.Delete(cfg.domyslnaNazwaPlikustringsTransifexCOMTXT); }
                         }
 
@@ -1509,13 +1669,31 @@ namespace PWRlangConverter
                     {
                         int indeks_oznaczeniaaktualizacji = (int.Parse(numer_pozycji_string)) - 1;
 
-                        try
+                        if ((indeks_oznaczeniaaktualizacji >= 0) && (lista_oznaczen_aktualizacji.Count - 1 >= indeks_oznaczeniaaktualizacji))
                         {
-                            WdrazanieAktualizacji_Wielowatkowe(lista_oznaczen_aktualizacji[indeks_oznaczeniaaktualizacji]);
+
+                            string[] tmp2_loa = lista_oznaczen_aktualizacji[indeks_oznaczeniaaktualizacji].Split(new char[] { '_' });
+
+                            if (tmp2_loa.Length >= 2)
+                            {
+                                string numerporzadkowy_aktualizacji = tmp2_loa[0];
+                                string oznaczenie_aktualizacji = tmp2_loa[1];
+
+                                WdrazanieAktualizacji_Wielowatkowe(numerporzadkowy_aktualizacji, oznaczenie_aktualizacji);
+
+                            }
+                            else
+                            {
+                                Blad("Wykryto przynajmniej jedną nieprawidłowość w nazwach plików metadanych aktualizacji.");
+
+                                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                                Console.ReadKey();
+                            }
+
                         }
-                        catch
+                        else
                         {
-                            Blad("Podano błędny numer pozycji aktualizacji. (#2)");
+                            Blad("Podano błędny numer pozycji. (#2)");
 
                             Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
                             Console.ReadKey();
@@ -1552,7 +1730,7 @@ namespace PWRlangConverter
 
         }
 
-        public static void WdrazanieAktualizacji_Wielowatkowe(string oznaczenie_aktualizacji) //oznaczenie_aktualizacji np: 1.0.1c-1.1.7c
+        public static void WdrazanieAktualizacji_Wielowatkowe(string numerporzadkowy_aktualizacji, string oznaczenie_aktualizacji) //numerporzadkowy_aktualizacji np: #2 oznaczenie_aktualizacji np: 1.0.1c-1.1.7c
         /* 
          * WYMAGA PLIKÓW METADANYCH AKTUALIZACJI WYGENEROWANYCH W PWRlangTools DO DZIAŁANIA. PLIKI TE MUSZĄ ZOSTAĆ UMIESZCZONE W FOLDERZE "PWRlangConverter\update\":
          * - <oznaczenie_wersji>.UpdateLocStruct
@@ -1604,8 +1782,8 @@ namespace PWRlangConverter
 
                 }
 
-                plikUpdateSchemaJSON_nazwa = oznaczenie_aktualizacji + ".UpdateSchema.json";
-                plikUpdateLocStructJSON_nazwa = oznaczenie_aktualizacji + ".UpdateLocStruct.json";
+                plikUpdateSchemaJSON_nazwa = numerporzadkowy_aktualizacji + "_" + oznaczenie_aktualizacji + ".UpdateSchema.json";
+                plikUpdateLocStructJSON_nazwa = numerporzadkowy_aktualizacji + "_" + oznaczenie_aktualizacji + ".UpdateLocStruct.json";
 
                 Console.WriteLine("Podano nazwę pliku .UpdateSchema.json dla aktualizacji " + oznaczenie_aktualizacji + ": " + plikUpdateSchemaJSON_nazwa);
                 Console.WriteLine("Podano nazwę pliku .UpdateLocStruct.json dla aktualizacji " + oznaczenie_aktualizacji + ": " + plikUpdateLocStructJSON_nazwa);
