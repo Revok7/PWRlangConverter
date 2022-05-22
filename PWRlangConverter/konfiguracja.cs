@@ -20,6 +20,7 @@ namespace PWRlangConverter
     public class konfiguracja
     {
         public string autoWprowadzanieNazwPlikowWejsciowych { get; set; }
+        public string zdefiniowaneMakro { get; set; }
         public string domyslnaNazwaPlikuTXTZTransifexCOM { get; set; }
         public string domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM { get; set; }
         public string domyslnaNazwaPlikukeysTransifexCOMTXT { get; set; }
@@ -40,6 +41,7 @@ namespace PWRlangConverter
                 plikCFGdomyslny_sw.WriteLine("{");
 
                 plikCFGdomyslny_sw.WriteLine("      \"autoWprowadzanieNazwPlikowWejsciowych\": \"0\",");
+                plikCFGdomyslny_sw.WriteLine("      \"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTZTransifexCOM\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikukeysTransifexCOMTXT\": \"\",");

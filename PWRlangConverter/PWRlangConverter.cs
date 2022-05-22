@@ -1,4 +1,6 @@
-﻿using System;
+﻿//UWAGA: NIE ZMIENIAĆ NUMERÓW OPERACJI, ZE WZGLĘDU NA ZAIMPLEMENTOWANE MAKRA OD WERSJI v.1.7
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +33,11 @@ namespace PWRlangConverter
 
         static DateTime aktualny_czas = DateTime.Now;
 
+        //static string[] makro_instancje;
+        //static string[] makro_operacje;
+
+        static int tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumeryporzadkowe_wybor;
+        static string tmpdlawatkow_2xtransifexCOMtxttoJSON_numerporzadkowy; //numer porządkowy bazy lub aktualizacji, np.: #1, #2 itd.
         static int tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumerylinii_wybor;
         static uint tmpdlawatkow_2xtransifexCOMtxttoJSON_iloscwszystkichliniiTXTTMP;
         static uint tmpdlawatkow_2xtransifexCOMtxttoJSON_numeraktualnejlinii = 1;
@@ -235,6 +242,7 @@ namespace PWRlangConverter
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("---------------------------------------");
+                Console.WriteLine("0. Uruchomienie makra lub jego zdefiniowanie.");
                 Console.WriteLine("1. [1xstringsTransifexCOM] Weryfikacja identyfikatorów numerów linii na początku stringów w pliku TXT pochodzącego z Transifex.com.");
                 Console.WriteLine("2. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON.");
                 Console.WriteLine("3. [JSON->JSON] Konwersja pliku JSON z polskimi znakami na plik bez polskich znakow.");
@@ -249,7 +257,11 @@ namespace PWRlangConverter
                 {
                     int numer_operacji_int = int.Parse(numer_operacji_string);
 
-                    if (numer_operacji_int == 1)
+                    if (numer_operacji_int == 0)
+                    {
+                        MenuMakr();
+                    }
+                    else if (numer_operacji_int == 1)
                     {
                         WeryfikacjaPlikowMetadanych("StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach");
                     }
@@ -450,6 +462,89 @@ namespace PWRlangConverter
             }
         }
 
+        public static void MenuMakr()
+        {
+            string numer_operacji2_string;
+            Console.WriteLine("1. Uruchom zdefiniowane wcześniej makro: \"" + cfg.zdefiniowaneMakro + "\"");
+            Console.WriteLine("2. Instrukcja zdefiniowania makra.");
+            Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
+
+            numer_operacji2_string = Console.ReadLine();
+
+            if (CzyParsowanieINTUdane(numer_operacji2_string))
+            {
+                int numer_operacji2_int = int.Parse(numer_operacji2_string);
+
+                if (numer_operacji2_int == 1)
+                {
+                    string[] makro_operacje_string = cfg.zdefiniowaneMakro.Split(';');
+
+                    List<string> makro_operacje_lista = new List<string>();
+
+                    for (int mis = 0; mis < makro_operacje_string.Length; mis++)
+                    {
+                            makro_operacje_lista.Add(makro_operacje_string[mis]);
+
+                            //Console.WriteLine(makro_operacje_string[mis]);
+
+                    }
+
+
+                    //DEBUGtest - START
+                    Console.WriteLine("makro_operacje_lista.Count: " + makro_operacje_lista.Count);
+                    for (int t1 = 0; t1 < makro_operacje_lista.Count; t1++)
+                    {
+                        Console.WriteLine("makro_operacje_lista[t1]:" + makro_operacje_lista[t1]);
+                    }
+                    //DEBUGtest - STOP
+
+
+                }
+                else if (numer_operacji2_int == 2)
+                {
+                    Console.WriteLine("Aby zdefiniować makro:\n" +
+                              "1. Edytuj plik \"cfg.json\" w edytorze tekstowym.\n" +
+                              "2. Odnajdź linię zawierającą wpis: '\"autoWprowadzanieNazwPlikowWejsciowych\": \"1\",' a jeśli wartość jest ustawiona na 0 to zmień ją na 1.\n" +
+                              "3. Odnajdź linię zawierającą wpis: '\"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",';\n" +
+                              "4. Zamiast tekstu <TUTAJ_ZDEFINIUJ_MAKRO> wpisz makro, które chcesz zdefiniować (przykład poniżej).\n" +
+                              "5. Uruchom ponownie PWRlangConverter." +
+                              "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je przecinkami ',', natomiast instancje makra oddzielaj średnikami ';'.\n" +
+                              "Na przykład zdefiniowanie makra: 1,1;1,2;2,1,0,0;2,2,1,0;100;1 spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
+                              "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym dla wersji gry 1.0.1c\n" +
+                              "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym aktualizacji dla wersji gry x.x.x\n" +
+                              "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: 1.0.1c (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
+                              "-Konwersja pliku aktualizacji lokalizacji TXT->JSON dla wersji gry: x.x.x (z dołączeniem numerów porządkowych, ale bez dołączenia numerów/id linii)\n" +
+                              "-Wdrażanie aktualizacji do pliku lokalizacji 1.0.1c->x.x.x\n" +
+                              "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2 i 100 tj. weryfikacji, konwersji TXT->JSON i wdrażania aktualizacji.");
+
+                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                    Console.ReadKey();
+                }
+                else
+                {
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Podano błędny numer operacji.");
+                    Console.ResetColor();
+
+                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                    Console.ReadKey();
+                }
+            }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine("Podano błedny numer operacji.");
+                Console.ResetColor();
+
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
+            }
+
+
+
+        }
+
+
         public static void WeryfikacjaPlikowMetadanych(string nazwa_metody_ktora_ma_zostac_uruchomiona)
         {
             Console.WriteLine("1. #1_1.0.1c");
@@ -509,6 +604,7 @@ namespace PWRlangConverter
 
                 if (numer_pozycji_int == 1)
                 {
+                    tmpdlawatkow_2xtransifexCOMtxttoJSON_numerporzadkowy = "#1";
 
                     //Console.WriteLine("DBG: Wybrano domyślny plik (czyli pozycję nr.: " + numer_pozycji_string + ").");
 
@@ -559,6 +655,7 @@ namespace PWRlangConverter
                             if (tmp1_loa.Length >= 2)
                             {
                                 string numerporzadkowy_aktualizacji = tmp1_loa[0];
+                                tmpdlawatkow_2xtransifexCOMtxttoJSON_numerporzadkowy = tmp1_loa[0];
                                 string oznaczenie_aktualizacji = tmp1_loa[1];
 
                                 domyslna_nazwaplikukeysTransifexCOMTXT = cfg.domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT
@@ -809,27 +906,44 @@ namespace PWRlangConverter
             Console.WriteLine("Podano nazwę pliku .keysTransifexCOM.txt: " + nazwaplikukeystxt);
             Console.WriteLine("Podano nazwę pliku .stringsTransifexCOM.txt: " + nazwaplikustringstxt);
 
-            Console.WriteLine("Czy dołączyć numery linii do lokalizacji, aby wyświetlały się w grze? (Wybierz numer poniższej opcji i zatwierdź ENTEREM.)");
-            Console.WriteLine("0. Nie dołączaj. (format: string)");
-            Console.WriteLine("1. Dołącz numery linii. (format: [numer_linii]string)");
-            Console.WriteLine("2. Dołącz numery i identyfikatory linii. (format: [numer_linii]<id_linii>string)");
-
-            string czydolaczycnumerylinii_wybor;
-            czydolaczycnumerylinii_wybor = Console.ReadLine();
-
-            if (czydolaczycnumerylinii_wybor == "1")
-            {
-                tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumerylinii_wybor = 1;
-                Console.WriteLine("Numery linii zostaną dołączone do lokalizacji i będą się wyświetlały w grze w formie szybkich linków do platformy Transifex.");
-            }
-            else if (czydolaczycnumerylinii_wybor == "2")
-            {
-                tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumerylinii_wybor = 2;
-                Console.WriteLine("Numery wraz z identyfikatorami linii zostaną dołączone do lokalizacji i będą się wyświetlały w grze w formie szybkich linków do platformy Transifex.");
-            }
-
             if (File.Exists(nazwaplikukeystxt) && File.Exists(nazwaplikustringstxt))
             {
+                Console.WriteLine("Czy dołączyć numer porządkowy bazy lub aktualizacji do każdej linii? (Wybierz numer poniższej opcji i zatwierdź ENTEREM.)");
+                Console.WriteLine("0. Nie dołączaj. (format: string)");
+                Console.WriteLine("1. Dołącz numer porządkowy. (format: #numer_porządkowy:string)");
+
+                string czydolaczycnumerporzadkowy_wybor;
+                czydolaczycnumerporzadkowy_wybor = Console.ReadLine();
+
+                if (czydolaczycnumerporzadkowy_wybor == "1")
+                {
+                    tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumeryporzadkowe_wybor = 1;
+                    Console.WriteLine("Numery porządkowe zostaną dołączone do lokalizacji i będą się wyświetlały w grze.");
+                }
+
+
+
+
+                Console.WriteLine("Czy dołączyć numery linii do lokalizacji, aby wyświetlały się w grze? (Wybierz numer poniższej opcji i zatwierdź ENTEREM.)");
+                Console.WriteLine("0. Nie dołączaj. (format: string)");
+                Console.WriteLine("1. Dołącz numery linii. (format: [numer_linii]string)");
+                Console.WriteLine("2. Dołącz numery i identyfikatory linii. (format: [numer_linii]<id_linii>string)");
+
+                string czydolaczycnumerylinii_wybor;
+                czydolaczycnumerylinii_wybor = Console.ReadLine();
+
+                if (czydolaczycnumerylinii_wybor == "1")
+                {
+                    tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumerylinii_wybor = 1;
+                    Console.WriteLine("Numery linii zostaną dołączone do lokalizacji i będą się wyświetlały w grze.");
+                }
+                else if (czydolaczycnumerylinii_wybor == "2")
+                {
+                    tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumerylinii_wybor = 2;
+                    Console.WriteLine("Numery wraz z identyfikatorami linii zostaną dołączone do lokalizacji i będą się wyświetlały w grze.");
+                }
+
+
                 nazwanowegoplikuJSON = "NOWY_" + nazwaplikukeystxt.Replace(".keysTransifexCOM.txt", "");
 
                 Console.WriteLine("Nazwa nowego pliku JSON to: " + nazwanowegoplikuJSON);
@@ -1245,6 +1359,11 @@ namespace PWRlangConverter
                                         else if (tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumerylinii_wybor == 2)
                                         {
                                             plikstringstxt_trescuaktualnionalinii = "<size=65%>[" + rzeczywistynumer_aktualnejlinii + "]</size>" + "<size=50%>" + "<" + nraktualnejliniiwplikuJSON + ">" + "</size>" + plikstringstxt_trescuaktualnionalinii;
+                                        }
+
+                                        if (tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumeryporzadkowe_wybor == 1)
+                                        {
+                                            plikstringstxt_trescuaktualnionalinii = "<size=30%>" + tmpdlawatkow_2xtransifexCOMtxttoJSON_numerporzadkowy + ":" + "</size>" + plikstringstxt_trescuaktualnionalinii;
                                         }
 
                                         if (plikstringstxt_sr_nraktualnejlinii != plikkeystxt_ilosclinii)
