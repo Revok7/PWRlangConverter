@@ -337,6 +337,10 @@ namespace PWRlangConverter
                     else
                     {
                         Blad("BŁĄD MAKRA: Nieprawidłowa kolejność wykonywania operacji! Pierwsza operacja musi być zdefiniowana w makrze jako operacja nr.: 1 (weryfikacja).");
+
+                        Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                        Console.ReadKey();
+
                     }
 
 
