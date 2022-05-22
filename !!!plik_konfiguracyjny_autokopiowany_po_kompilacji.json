@@ -1,6 +1,6 @@
 {
 	"autoWprowadzanieNazwPlikowWejsciowych": "1",
-	"zdefiniowaneMakro": "1;1;1;2",
+	"zdefiniowaneMakro": "1;1;1;2;1;3;2;1;1;1;2;2;1;0;2;3;1;2;100;1;100;2",
 	"domyslnaNazwaPlikuTXTZTransifexCOM": "for_use_PWR_PL_engb-101c-origjsonstringstransifexcomtxt_pl.txt",
 	"domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM": "for_use_%NUMER_PORZADKOWY_AKTUALIZACJI%-pwr_pl-korekta-aktualizacji-%OZNACZENIE_AKTUALIZACJI%_engb-update-%OZNACZENIE_AKTUALIZACJI%jsonstringstransifexcomtxt_pl.txt",
 	"domyslnaNazwaPlikukeysTransifexCOMTXT": "plPL-1.0.1c.json.keysTransifexCOM.txt",

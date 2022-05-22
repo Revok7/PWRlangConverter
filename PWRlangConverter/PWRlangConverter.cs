@@ -33,8 +33,13 @@ namespace PWRlangConverter
 
         static DateTime aktualny_czas = DateTime.Now;
 
-        //static string[] makro_instancje;
-        //static string[] makro_operacje;
+        static List<string> makro_operacje_lista = new List<string>();
+        static int makro_aktualny_indeks_listy;
+        static bool makro_aktywowane;
+        static bool makro_blad_stopujacy;
+        static bool makro_pomyslnezakonczenieoperacjinr2 = false;
+        static bool makro_pomyslnezakonczenieoperacjinr100 = false;
+
 
         static int tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumeryporzadkowe_wybor;
         static string tmpdlawatkow_2xtransifexCOMtxttoJSON_numerporzadkowy; //numer porządkowy bazy lub aktualizacji, np.: #1, #2 itd.
@@ -83,6 +88,12 @@ namespace PWRlangConverter
             Console.WriteLine(tresc);
             Console.ResetColor();
 
+        }
+        private static void Sukces2(string tresc)
+        {
+            Console.BackgroundColor = ConsoleColor.Blue;
+            Console.WriteLine(tresc);
+            Console.ResetColor();
         }
 
         private static string PoliczPostepWProcentach(double aktualna_linia, double wszystkich_linii)
@@ -215,7 +226,147 @@ namespace PWRlangConverter
 
         }
 
+        public static void Makro_UruchomienieKolejnejOperacji()
+        {
+            //reset zmiennych po poprzednich operacjach
+            makro_pomyslnezakonczenieoperacjinr2 = false;
+            makro_pomyslnezakonczenieoperacjinr100 = false;
 
+            int makro_sprawdzeniekolejnejoperacji = makro_aktualny_indeks_listy + 1;
+
+            if (makro_sprawdzeniekolejnejoperacji < makro_operacje_lista.Count)
+            {
+                makro_aktualny_indeks_listy++;
+
+                int makro_operacjadowykonania = int.Parse(makro_operacje_lista[makro_aktualny_indeks_listy]);
+
+                if (makro_operacjadowykonania == 1)
+                {
+                    WeryfikacjaPlikowMetadanych("StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach");
+                }
+                else if (makro_operacjadowykonania == 2)
+                {
+                    WeryfikacjaPlikowMetadanych("TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON");
+                }
+                else if (makro_operacjadowykonania == 100)
+                {
+                    WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych();
+                }
+
+            }
+            else
+            {
+                Sukces2("Wszystkie operacje ze zdefiniowanego makra zostały wykonane.");
+
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
+
+            }
+
+        }
+
+        public static void Makro_BladStopujacy()
+        {
+            makro_blad_stopujacy = true;
+            Blad("Wykryto błędy, które uniemożliwiły ukończenie wszystkich zaplanowanych operacji ze zdefiniowanego makra.");
+        }
+
+        public static void MenuMakr()
+        {
+            string numer_operacji2_string;
+            Console.WriteLine("1. Uruchom zdefiniowane wcześniej makro: \"" + cfg.zdefiniowaneMakro + "\"");
+            Console.WriteLine("2. Instrukcja zdefiniowania makra.");
+            Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
+
+            numer_operacji2_string = Console.ReadLine();
+
+            if (CzyParsowanieINTUdane(numer_operacji2_string))
+            {
+                int numer_operacji2_int = int.Parse(numer_operacji2_string);
+
+                if (numer_operacji2_int == 1)
+                {
+                    string[] makro_operacje_string = cfg.zdefiniowaneMakro.Split(';');
+
+                    for (int mis = 0; mis < makro_operacje_string.Length; mis++)
+                    {
+                        makro_operacje_lista.Add(makro_operacje_string[mis]);
+
+                        //Console.WriteLine(makro_operacje_string[mis]);
+
+                    }
+
+
+                    //DEBUGtest - START
+                    Console.WriteLine("makro_operacje_lista.Count: " + makro_operacje_lista.Count);
+                    for (int t1 = 0; t1 < makro_operacje_lista.Count; t1++)
+                    {
+                        Console.WriteLine("makro_operacje_lista[t1]:" + makro_operacje_lista[t1]);
+                    }
+                    //DEBUGtest - STOP
+
+
+                    if (int.Parse(makro_operacje_lista[0]) == 1)
+                    {
+                        makro_aktywowane = true;
+                        makro_aktualny_indeks_listy = 0;
+
+                        WeryfikacjaPlikowMetadanych("StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach");
+
+                    }
+                    else
+                    {
+                        Blad("BŁĄD MAKRA: Nieprawidłowa kolejność wykonywania operacji! Pierwsza operacja musi być zdefiniowana w makrze jako operacja nr.: 1 (weryfikacja).");
+                    }
+
+
+
+
+
+                }
+                else if (numer_operacji2_int == 2)
+                {
+                    Console.WriteLine("Aby zdefiniować makro:\n" +
+                              "1. Edytuj plik \"cfg.json\" w edytorze tekstowym.\n" +
+                              "2. Odnajdź linię zawierającą wpis: '\"autoWprowadzanieNazwPlikowWejsciowych\": \"1\",' a jeśli wartość jest ustawiona na 0 to zmień ją na 1.\n" +
+                              "3. Odnajdź linię zawierającą wpis: '\"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",';\n" +
+                              "4. Zamiast tekstu <TUTAJ_ZDEFINIUJ_MAKRO> wpisz makro, które chcesz zdefiniować (przykład poniżej).\n" +
+                              "5. Uruchom ponownie PWRlangConverter." +
+                              "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je przecinkami ',', natomiast instancje makra oddzielaj średnikami ';'.\n" +
+                              "Na przykład zdefiniowanie makra: 1,1;1,2;2,1,0,0;2,2,1,0;100;1 spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
+                              "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym dla wersji gry 1.0.1c\n" +
+                              "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym aktualizacji dla wersji gry x.x.x\n" +
+                              "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: 1.0.1c (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
+                              "-Konwersja pliku aktualizacji lokalizacji TXT->JSON dla wersji gry: x.x.x (z dołączeniem numerów porządkowych, ale bez dołączenia numerów/id linii)\n" +
+                              "-Wdrażanie aktualizacji do pliku lokalizacji 1.0.1c->x.x.x\n" +
+                              "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2 i 100 tj. weryfikacji, konwersji TXT->JSON i wdrażania aktualizacji.");
+
+                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                    Console.ReadKey();
+                }
+                else
+                {
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Podano błędny numer operacji.");
+                    Console.ResetColor();
+
+                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                    Console.ReadKey();
+                }
+            }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine("Podano błedny numer operacji.");
+                Console.ResetColor();
+
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
+            }
+
+
+
+        }
 
         static void Main(string[] args)
         {
@@ -238,7 +389,7 @@ namespace PWRlangConverter
 
                 string numer_operacji_string;
 
-                Console.WriteLine("PWRlangConverter v.1.6 by Revok (2022)");
+                Console.WriteLine("PWRlangConverter v.1.7 by Revok (2022)");
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("---------------------------------------");
@@ -462,89 +613,6 @@ namespace PWRlangConverter
             }
         }
 
-        public static void MenuMakr()
-        {
-            string numer_operacji2_string;
-            Console.WriteLine("1. Uruchom zdefiniowane wcześniej makro: \"" + cfg.zdefiniowaneMakro + "\"");
-            Console.WriteLine("2. Instrukcja zdefiniowania makra.");
-            Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
-
-            numer_operacji2_string = Console.ReadLine();
-
-            if (CzyParsowanieINTUdane(numer_operacji2_string))
-            {
-                int numer_operacji2_int = int.Parse(numer_operacji2_string);
-
-                if (numer_operacji2_int == 1)
-                {
-                    string[] makro_operacje_string = cfg.zdefiniowaneMakro.Split(';');
-
-                    List<string> makro_operacje_lista = new List<string>();
-
-                    for (int mis = 0; mis < makro_operacje_string.Length; mis++)
-                    {
-                            makro_operacje_lista.Add(makro_operacje_string[mis]);
-
-                            //Console.WriteLine(makro_operacje_string[mis]);
-
-                    }
-
-
-                    //DEBUGtest - START
-                    Console.WriteLine("makro_operacje_lista.Count: " + makro_operacje_lista.Count);
-                    for (int t1 = 0; t1 < makro_operacje_lista.Count; t1++)
-                    {
-                        Console.WriteLine("makro_operacje_lista[t1]:" + makro_operacje_lista[t1]);
-                    }
-                    //DEBUGtest - STOP
-
-
-                }
-                else if (numer_operacji2_int == 2)
-                {
-                    Console.WriteLine("Aby zdefiniować makro:\n" +
-                              "1. Edytuj plik \"cfg.json\" w edytorze tekstowym.\n" +
-                              "2. Odnajdź linię zawierającą wpis: '\"autoWprowadzanieNazwPlikowWejsciowych\": \"1\",' a jeśli wartość jest ustawiona na 0 to zmień ją na 1.\n" +
-                              "3. Odnajdź linię zawierającą wpis: '\"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",';\n" +
-                              "4. Zamiast tekstu <TUTAJ_ZDEFINIUJ_MAKRO> wpisz makro, które chcesz zdefiniować (przykład poniżej).\n" +
-                              "5. Uruchom ponownie PWRlangConverter." +
-                              "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je przecinkami ',', natomiast instancje makra oddzielaj średnikami ';'.\n" +
-                              "Na przykład zdefiniowanie makra: 1,1;1,2;2,1,0,0;2,2,1,0;100;1 spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
-                              "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym dla wersji gry 1.0.1c\n" +
-                              "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym aktualizacji dla wersji gry x.x.x\n" +
-                              "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: 1.0.1c (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
-                              "-Konwersja pliku aktualizacji lokalizacji TXT->JSON dla wersji gry: x.x.x (z dołączeniem numerów porządkowych, ale bez dołączenia numerów/id linii)\n" +
-                              "-Wdrażanie aktualizacji do pliku lokalizacji 1.0.1c->x.x.x\n" +
-                              "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2 i 100 tj. weryfikacji, konwersji TXT->JSON i wdrażania aktualizacji.");
-
-                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-                    Console.ReadKey();
-                }
-                else
-                {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Podano błędny numer operacji.");
-                    Console.ResetColor();
-
-                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-                    Console.ReadKey();
-                }
-            }
-            else
-            {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("Podano błedny numer operacji.");
-                Console.ResetColor();
-
-                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-                Console.ReadKey();
-            }
-
-
-
-        }
-
-
         public static void WeryfikacjaPlikowMetadanych(string nazwa_metody_ktora_ma_zostac_uruchomiona)
         {
             Console.WriteLine("1. #1_1.0.1c");
@@ -592,7 +660,16 @@ namespace PWRlangConverter
 
             string numer_pozycji_string;
             Console.Write("Wpisz numer pozycji, której konwersja ma dotyczyć: ");
-            numer_pozycji_string = Console.ReadLine();
+
+            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+            {
+                makro_aktualny_indeks_listy = makro_aktualny_indeks_listy + 1;
+                numer_pozycji_string = makro_operacje_lista[makro_aktualny_indeks_listy];
+            }
+            else
+            {
+                numer_pozycji_string = Console.ReadLine();
+            }
 
             if (CzyParsowanieINTUdane(numer_pozycji_string))
             {
@@ -833,6 +910,8 @@ namespace PWRlangConverter
                 Console.BackgroundColor = ConsoleColor.Red;
                 Console.WriteLine("BŁĄD: W folderze z programem nie istnieje plik o nazwie \"" + nazwaplikustringsTransifexCOMTXT + "\".");
                 Console.ResetColor();
+
+                
             }
 
 
@@ -843,9 +922,12 @@ namespace PWRlangConverter
                 {
                     Sukces("Nie znaleziono błędów w identyfikatorach linii na początku stringów.");
                 }
+
             }
             else
             {
+                
+
                 Blad("Znaleziono błędów w pliku: " + bledy_iloscwykrytych);
 
                 for (int ib = 0; ib < bledy_iloscwykrytych; ib++)
@@ -859,10 +941,24 @@ namespace PWRlangConverter
             }
 
 
-            Console.ResetColor();
+            if (makro_aktywowane == true)
+            {
+                if (bledy_iloscwykrytych == 0)
+                {
+                    Makro_UruchomienieKolejnejOperacji();
+                }
+                else
+                {
+                    Makro_BladStopujacy();
+                }
+            }
+            else
+            {
+                Console.ResetColor();
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
+            }
 
 
 
@@ -913,7 +1009,16 @@ namespace PWRlangConverter
                 Console.WriteLine("1. Dołącz numer porządkowy. (format: #numer_porządkowy:string)");
 
                 string czydolaczycnumerporzadkowy_wybor;
-                czydolaczycnumerporzadkowy_wybor = Console.ReadLine();
+
+                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                {
+                    makro_aktualny_indeks_listy = makro_aktualny_indeks_listy + 1;
+                    czydolaczycnumerporzadkowy_wybor = makro_operacje_lista[makro_aktualny_indeks_listy];
+                }
+                else
+                {
+                    czydolaczycnumerporzadkowy_wybor = Console.ReadLine();
+                }
 
                 if (czydolaczycnumerporzadkowy_wybor == "1")
                 {
@@ -930,7 +1035,18 @@ namespace PWRlangConverter
                 Console.WriteLine("2. Dołącz numery i identyfikatory linii. (format: [numer_linii]<id_linii>string)");
 
                 string czydolaczycnumerylinii_wybor;
-                czydolaczycnumerylinii_wybor = Console.ReadLine();
+
+                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                {
+                    makro_aktualny_indeks_listy = makro_aktualny_indeks_listy + 1;
+                    czydolaczycnumerylinii_wybor = makro_operacje_lista[makro_aktualny_indeks_listy];
+
+                }
+                else
+                {
+                    czydolaczycnumerylinii_wybor = Console.ReadLine();
+                }
+
 
                 if (czydolaczycnumerylinii_wybor == "1")
                 {
@@ -1178,6 +1294,8 @@ namespace PWRlangConverter
                             if (File.Exists(cfg.domyslnaNazwaPlikustringsTransifexCOMTXT) == true) { File.Delete(cfg.domyslnaNazwaPlikustringsTransifexCOMTXT); }
                         }
 
+                        makro_pomyslnezakonczenieoperacjinr2 = true;
+
                         Console.BackgroundColor = ConsoleColor.Green;
                         Console.WriteLine("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
                         Console.ResetColor();
@@ -1200,14 +1318,27 @@ namespace PWRlangConverter
                 Console.ResetColor();
             }
 
-
+            //czyszczenie pamięci
             UsunPlikiTMP(tmpdlawatkow_2xtransifexCOMtxttoJSON_listaplikowkeystxtTMP);
             UsunPlikiTMP(tmpdlawatkow_2xtransifexCOMtxttoJSON_listaplikowstringstxtTMP);
             UsunPlikiTMP(tmpdlawatkow_2xtransifexCOMtxttoJSON_listaplikowjsonTMP);
+            tmpdlawatkow_2xtransifexCOMtxttoJSON_iloscwszystkichliniiTXTTMP = 0;
+            tmpdlawatkow_2xtransifexCOMtxttoJSON_numeraktualnejlinii = 1;
+            tmpdlawatkow_2xtransifexCOMtxttoJSON_listaplikowkeystxtTMP.Clear();
+            tmpdlawatkow_2xtransifexCOMtxttoJSON_listaplikowstringstxtTMP.Clear();
+            tmpdlawatkow_2xtransifexCOMtxttoJSON_listaplikowjsonTMP.Clear();
 
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
+
+            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1 && makro_pomyslnezakonczenieoperacjinr2 == true)
+            {
+                Makro_UruchomienieKolejnejOperacji();
+            }
+            else
+            {
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
+            }
 
         }
 
@@ -1780,7 +1911,17 @@ namespace PWRlangConverter
                 {
                     string numer_pozycji_string;
                     Console.Write("Wpisz numer pozycji aktualizacji, którą chcesz wdrożyć: ");
-                    numer_pozycji_string = Console.ReadLine();
+
+                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    {
+                        makro_aktualny_indeks_listy = makro_aktualny_indeks_listy + 1;
+                        numer_pozycji_string = makro_operacje_lista[makro_aktualny_indeks_listy];
+                        Console.WriteLine(makro_operacje_lista[makro_aktualny_indeks_listy]);
+                    }
+                    else
+                    {
+                        numer_pozycji_string = Console.ReadLine();
+                    }
 
 
 
@@ -2137,14 +2278,12 @@ namespace PWRlangConverter
 
                     if (stopkaJSON_rezultat == true)
                     {
-                        if (cfg.autoWprowadzanieNazwPlikowWejsciowych == "1")
-                        {
-                            
-                        }
+                        makro_pomyslnezakonczenieoperacjinr100 = true;
 
                         Console.BackgroundColor = ConsoleColor.Green;
                         Console.WriteLine("Plik JSON o nazwie \"" + nazwafinalnegoplikuJSON + "\" zostal wygenerowany.");
                         Console.ResetColor();
+
                     }
 
 
@@ -2162,12 +2301,40 @@ namespace PWRlangConverter
                 Blad("Nie istnieje folder \"" + folderupdate.Replace("//", "\\") + "\" zawierający metadane o aktualizacji.");
             }
 
-
+            //czyszczenie pamięci
             UsunPlikiTMP(tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_listaplikowjsonTMP);
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_numeraktualnejlinii = 1;
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_oznaczenieaktualizacji = "";
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__Schemat_tablicalistdanych = null;
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__StrukturaLokalizacji_tablicalistdanych = null;
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiStarejWersji_tablicalistdanych = null;
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiZAktualizacjaDoNowejWersji_tablicalistdanych = null;
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__Schemat_listakluczy.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__StrukturaLokalizacji_listakluczy.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiStarejWersji_listakluczy.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiZAktualizacjaDoNowejWersji_listakluczy.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__StrukturaLokalizacji.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiStarejWersji_listastringow.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiZAktualizacjaDoNowejWersji_listastringow.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_iloscwszystkichkluczyplikuUpdateSchemaJSONTMP = 0;
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_listaplikowjsonTMP.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_zakresindeksowOD.Clear();
+            tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_zakresindeksowDO.Clear();
 
 
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
+
+            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1 && makro_pomyslnezakonczenieoperacjinr100 == true)
+            {
+                Makro_UruchomienieKolejnejOperacji();
+            }
+            else
+            {
+
+                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                Console.ReadKey();
+
+            }
+
 
 
         }
