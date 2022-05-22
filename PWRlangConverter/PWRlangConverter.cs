@@ -36,10 +36,10 @@ namespace PWRlangConverter
         static List<string> makro_operacje_lista = new List<string>();
         static int makro_aktualny_indeks_listy;
         static bool makro_aktywowane;
-        static bool makro_blad_stopujacy;
         static bool makro_pomyslnezakonczenieoperacjinr2 = false;
         static bool makro_pomyslnezakonczenieoperacjinr100 = false;
-
+        static List<string> makro_bledy_lista = new List<string>(); //element listy: "makro_numeroperacjiwkolejnosci;komunikat_obledzie"
+        static List<string> makro_sukcesy_lista = new List<string>(); //element listy: "makro_numeroperacjiwkolejnosci;komunikat_osukcesie"
 
         static int tmpdlawatkow_2xtransifexCOMtxttoJSON_czydolaczycnumeryporzadkowe_wybor;
         static string tmpdlawatkow_2xtransifexCOMtxttoJSON_numerporzadkowy; //numer porządkowy bazy lub aktualizacji, np.: #1, #2 itd.
@@ -228,47 +228,67 @@ namespace PWRlangConverter
 
         public static void Makro_UruchomienieKolejnejOperacji()
         {
-            //reset zmiennych po poprzednich operacjach
-            makro_pomyslnezakonczenieoperacjinr2 = false;
-            makro_pomyslnezakonczenieoperacjinr100 = false;
-
-            int makro_sprawdzeniekolejnejoperacji = makro_aktualny_indeks_listy + 1;
-
-            if (makro_sprawdzeniekolejnejoperacji < makro_operacje_lista.Count)
+            if (makro_bledy_lista.Count == 0)
             {
-                makro_aktualny_indeks_listy++;
+                //reset zmiennych po poprzednich operacjach
+                makro_pomyslnezakonczenieoperacjinr2 = false;
+                makro_pomyslnezakonczenieoperacjinr100 = false;
 
-                int makro_operacjadowykonania = int.Parse(makro_operacje_lista[makro_aktualny_indeks_listy]);
+                int makro_sprawdzeniekolejnejoperacji = makro_aktualny_indeks_listy + 1;
 
-                if (makro_operacjadowykonania == 1)
+                if (makro_sprawdzeniekolejnejoperacji < makro_operacje_lista.Count)
                 {
-                    WeryfikacjaPlikowMetadanych("StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach");
+                    makro_aktualny_indeks_listy++;
+
+                    int makro_operacjadowykonania = int.Parse(makro_operacje_lista[makro_aktualny_indeks_listy]);
+
+                    if (makro_operacjadowykonania == 1)
+                    {
+                        WeryfikacjaPlikowMetadanych("StringsTransifexCOMTXT_WeryfikacjaIdentyfikatorówNumerówLiniiWStringach");
+                    }
+                    else if (makro_operacjadowykonania == 2)
+                    {
+                        WeryfikacjaPlikowMetadanych("TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON");
+                    }
+                    else if (makro_operacjadowykonania == 100)
+                    {
+                        WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych();
+                    }
+
                 }
-                else if (makro_operacjadowykonania == 2)
+                else
                 {
-                    WeryfikacjaPlikowMetadanych("TXTTransifexCOMtoJSON_WielowatkowyZNumeramiLiniiZPlikuJSON");
-                }
-                else if (makro_operacjadowykonania == 100)
-                {
-                    WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych();
+                    Sukces2("Wszystkie operacje ze zdefiniowanego makra zostały wykonane.");
+
+                    Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+                    Console.ReadKey();
+
                 }
 
             }
             else
             {
-                Sukces2("Wszystkie operacje ze zdefiniowanego makra zostały wykonane.");
-
-                Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-                Console.ReadKey();
-
+                Makro_BladStopujacy();
             }
+
 
         }
 
         public static void Makro_BladStopujacy()
         {
-            makro_blad_stopujacy = true;
-            Blad("Wykryto błędy, które uniemożliwiły ukończenie wszystkich zaplanowanych operacji ze zdefiniowanego makra.");
+            Blad("Wykryto błędy, które uniemożliwiły ukończenie wszystkich zaplanowanych operacji ze zdefiniowanego makra:");
+
+            for (int wib = 0; wib < makro_bledy_lista.Count; wib++)
+            {
+                string[] dany_komunikat = makro_bledy_lista[wib].Split(';');
+                if (dany_komunikat.Length == 2)
+                {
+                    Blad("[Błąd podczas wykonywania operacji makra: " + dany_komunikat[0] + "/" + makro_operacje_lista.Count + "] " + dany_komunikat[1]);
+                }
+            }
+
+            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+            Console.ReadKey();
         }
 
         public static void MenuMakr()
@@ -296,7 +316,7 @@ namespace PWRlangConverter
 
                     }
 
-
+                    /*
                     //DEBUGtest - START
                     Console.WriteLine("makro_operacje_lista.Count: " + makro_operacje_lista.Count);
                     for (int t1 = 0; t1 < makro_operacje_lista.Count; t1++)
@@ -304,7 +324,7 @@ namespace PWRlangConverter
                         Console.WriteLine("makro_operacje_lista[t1]:" + makro_operacje_lista[t1]);
                     }
                     //DEBUGtest - STOP
-
+                    */
 
                     if (int.Parse(makro_operacje_lista[0]) == 1)
                     {
@@ -326,20 +346,23 @@ namespace PWRlangConverter
                 }
                 else if (numer_operacji2_int == 2)
                 {
-                    Console.WriteLine("Aby zdefiniować makro:\n" +
-                              "1. Edytuj plik \"cfg.json\" w edytorze tekstowym.\n" +
-                              "2. Odnajdź linię zawierającą wpis: '\"autoWprowadzanieNazwPlikowWejsciowych\": \"1\",' a jeśli wartość jest ustawiona na 0 to zmień ją na 1.\n" +
-                              "3. Odnajdź linię zawierającą wpis: '\"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",';\n" +
-                              "4. Zamiast tekstu <TUTAJ_ZDEFINIUJ_MAKRO> wpisz makro, które chcesz zdefiniować (przykład poniżej).\n" +
-                              "5. Uruchom ponownie PWRlangConverter." +
-                              "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je przecinkami ',', natomiast instancje makra oddzielaj średnikami ';'.\n" +
-                              "Na przykład zdefiniowanie makra: 1,1;1,2;2,1,0,0;2,2,1,0;100;1 spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
+                    Console.WriteLine("Prawidłowo zdefiniowane makro umożliwia wykonanie wszystkich wymaganych operacji w zautomatyzowany sposób." +
+                              "Aby zdefiniować makro lub zmodyfikować już istniejące, należy:\n" +
+                              "1. Edytować plik \"cfg.json\" w edytorze tekstowym.\n" +
+                              "2. Odnaleźć linię zawierającą wpis: '\"autoWprowadzanieNazwPlikowWejsciowych\": \"1\",' a jeśli wartość jest ustawiona na 0 to zmień ją na 1.\n" +
+                              "3. Odnaleźć linię zawierającą wpis: '\"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",';\n" +
+                              "4. Zamiast tekstu <TUTAJ_ZDEFINIUJ_MAKRO> wpisać makro, które chcemy zdefiniować (przykład poniżej).\n" +
+                              "5. Zapisać plik i uruchomić ponownie PWRlangConverter." +
+                              "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je przecinkami ','.\n" +
+                              "Na przykład zdefiniowanie makra: 1,1,1,2,2,1,0,0,2,2,1,0,100,1 spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
                               "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym dla wersji gry 1.0.1c\n" +
                               "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym aktualizacji dla wersji gry x.x.x\n" +
                               "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: 1.0.1c (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
                               "-Konwersja pliku aktualizacji lokalizacji TXT->JSON dla wersji gry: x.x.x (z dołączeniem numerów porządkowych, ale bez dołączenia numerów/id linii)\n" +
                               "-Wdrażanie aktualizacji do pliku lokalizacji 1.0.1c->x.x.x\n" +
-                              "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2 i 100 tj. weryfikacji, konwersji TXT->JSON i wdrażania aktualizacji.");
+                              "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2 i 100 tj. weryfikacji, konwersji TXT->JSON i wdrażania aktualizacji.\n" +
+                              "UWAGA2: Pierwsza operacja makra musi zostać zdefiniowana jako: 1 (tj. weryfikacja).\n" +
+                              "UWAGA3: Zaleca się definiowanie makra w taki sposób aby w pierwszej kolejności wykonywać operacje weryfikacji (1) dla wszystkich plików po kolei, następnie konwersję (2) dla wszystkich plików, a na końcu wdrażanie aktualizacji (100) po kolei dla wszystkich plików.");
 
                     Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
                     Console.ReadKey();
@@ -665,6 +688,8 @@ namespace PWRlangConverter
             {
                 makro_aktualny_indeks_listy = makro_aktualny_indeks_listy + 1;
                 numer_pozycji_string = makro_operacje_lista[makro_aktualny_indeks_listy];
+
+                Console.WriteLine(makro_operacje_lista[makro_aktualny_indeks_listy]);
             }
             else
             {
@@ -770,6 +795,7 @@ namespace PWRlangConverter
                     }
                     else
                     {
+
                         Blad("Podano błędny numer pozycji. (#3)");
 
                         Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
@@ -848,7 +874,15 @@ namespace PWRlangConverter
 
                         if (wl_pasekpostepu == false)
                         {
-                            Console.WriteLine("Trwa analizowanie linii nr: " + plik_stringsTransifexCOMTXT_aktualnalinia + "/" + plik_stringsTransifexCOMTXT_liczbalinii + " [" + PoliczPostepWProcentach(plik_stringsTransifexCOMTXT_aktualnalinia, plik_stringsTransifexCOMTXT_liczbalinii) + "%]");
+                            string komunikat_aktualnypostep = "Trwa analizowanie linii nr: " + plik_stringsTransifexCOMTXT_aktualnalinia + "/" + plik_stringsTransifexCOMTXT_liczbalinii + " [" + PoliczPostepWProcentach(plik_stringsTransifexCOMTXT_aktualnalinia, plik_stringsTransifexCOMTXT_liczbalinii) + "%]";
+
+                            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                            {
+                                int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+                                komunikat_aktualnypostep = "[Operacja makra: " + makro_numeroperacjiwkolejnosci + "/" + makro_operacje_lista.Count + "] " + komunikat_aktualnypostep;
+                            }
+
+                            Console.WriteLine(komunikat_aktualnypostep);
                         }
                         else if (wl_pasekpostepu == true)
                         {
@@ -892,9 +926,19 @@ namespace PWRlangConverter
                 {
                     nie_wyswietlaj_komunikatu_o_sukcesie = true;
 
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Wystapil nieoczekiwany błąd w dostępie do pliku.");
-                    Console.ResetColor();
+                    string komunikat_obledzie;
+                    komunikat_obledzie = "BŁĄD: Wystapil nieoczekiwany błąd w dostępie do pliku.";
+
+                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    {
+                        int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                        makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                    }
+
+                    Blad(komunikat_obledzie);
+
                 }
 
 
@@ -907,9 +951,18 @@ namespace PWRlangConverter
             {
                 nie_wyswietlaj_komunikatu_o_sukcesie = true;
 
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: W folderze z programem nie istnieje plik o nazwie \"" + nazwaplikustringsTransifexCOMTXT + "\".");
-                Console.ResetColor();
+                string komunikat_obledzie;
+                komunikat_obledzie = "BŁĄD: W folderze z programem nie istnieje plik o nazwie \"" + nazwaplikustringsTransifexCOMTXT + "\".";
+
+                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                {
+                    int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                    makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                }
+
+                Blad(komunikat_obledzie);
 
                 
             }
@@ -920,7 +973,20 @@ namespace PWRlangConverter
             {
                 if (nie_wyswietlaj_komunikatu_o_sukcesie == false)
                 {
-                    Sukces("Nie znaleziono błędów w identyfikatorach linii na początku stringów.");
+
+                    string komunikat_osukcesie;
+                    komunikat_osukcesie = "Nie znaleziono błędów w identyfikatorach linii na początku stringów.";
+
+                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    {
+                        int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                        makro_sukcesy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_osukcesie);
+
+                    }
+
+
+                    Sukces(komunikat_osukcesie);
                 }
 
             }
@@ -935,22 +1001,27 @@ namespace PWRlangConverter
                     int numer_linii = bledy[ib];
                     int poprawny_identyfikator_linii = numer_linii + 3;
 
-                    Blad("Wykryto błąd w linii nr: " + numer_linii + " (poprawny id powinien mieć treść: <" + poprawny_identyfikator_linii.ToString() + ">)");
+                    string komunikat_obledzie;
+                    komunikat_obledzie = "Wykryto błąd w linii nr: " + numer_linii + " (poprawny id powinien mieć treść: <" + poprawny_identyfikator_linii.ToString() + ">)";
+
+                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    {
+                        int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                        makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                    }
+
+
+                    Blad(komunikat_obledzie);
                 }
 
             }
 
 
-            if (makro_aktywowane == true)
+            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
             {
-                if (bledy_iloscwykrytych == 0)
-                {
-                    Makro_UruchomienieKolejnejOperacji();
-                }
-                else
-                {
-                    Makro_BladStopujacy();
-                }
+                Makro_UruchomienieKolejnejOperacji();
             }
             else
             {
@@ -1259,9 +1330,20 @@ namespace PWRlangConverter
                             }
                             catch (Exception Error)
                             {
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #2 (for-lpj: " + lpj + ", Error: " + Error + ")!");
-                                Console.ResetColor();
+
+                                string komunikat_obledzie;
+                                komunikat_obledzie = "BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #2 (for-lpj: " + lpj + ", Error: " + Error + ")!";
+
+                                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                                {
+                                    int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                                    makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                                }
+
+                                Blad(komunikat_obledzie);
+
                             }
 
                             plikjsonTMP_fs.Close();
@@ -1276,9 +1358,20 @@ namespace PWRlangConverter
                     }
                     catch (Exception Error)
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #1 (Error: " + Error + ")!");
-                        Console.ResetColor();
+
+                        string komunikat_obledzie;
+                        komunikat_obledzie = "BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #1 (Error: " + Error + ")!";
+
+                        if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                        {
+                            int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                            makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                        }
+
+                        Blad(komunikat_obledzie);
+
                     }
 
 
@@ -1296,26 +1389,57 @@ namespace PWRlangConverter
 
                         makro_pomyslnezakonczenieoperacjinr2 = true;
 
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.");
-                        Console.ResetColor();
+                        string komunikat_osukcesie;
+                        komunikat_osukcesie = "Plik JSON o nazwie \"" + nazwanowegoplikuJSON + "\" zostal wygenerowany.";
+
+                        if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                        {
+                            int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                            makro_sukcesy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_osukcesie);
+
+                        }
+
+
+                        Sukces(komunikat_osukcesie);
+
                     }
 
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
-                    Console.ResetColor();
+                    string komunikat_obledzie;
+                    komunikat_obledzie = "BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!";
+
+                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    {
+                        int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                        makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                    }
+
+                    Blad(komunikat_obledzie);
+
                 }
 
 
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: W folderze z programem nie istnieje przynajmniej jeden plik, których nazwy wskazano.");
-                Console.ResetColor();
+                string komunikat_obledzie;
+                komunikat_obledzie = "BŁĄD: W folderze z programem nie istnieje przynajmniej jeden plik, których nazwy wskazano.";
+
+                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                {
+                    int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                    makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                }
+
+                Blad(komunikat_obledzie);
+
             }
 
             //czyszczenie pamięci
@@ -1529,14 +1653,35 @@ namespace PWRlangConverter
                             }
                             catch (Exception Error)
                             {
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2) (Error: " + Error + ")");
-                                Console.ResetColor();
+
+                                string komunikat_obledzie;
+                                komunikat_obledzie = "BLAD: Wystapil nieoczekiwany blad w dostepie do plikow. (TRY #2) (Error: " + Error + ")";
+
+                                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                                {
+                                    int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                                    makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                                }
+
+                                Blad(komunikat_obledzie);
+
                             }
 
                             if (wl_pasekpostepu == false)
                             {
-                                Console.WriteLine("Trwa przygotowywanie linii nr.: " + tmpdlawatkow_2xtransifexCOMtxttoJSON_numeraktualnejlinii + "/" + tmpdlawatkow_2xtransifexCOMtxttoJSON_iloscwszystkichliniiTXTTMP + " [" + PoliczPostepWProcentach(tmpdlawatkow_2xtransifexCOMtxttoJSON_numeraktualnejlinii, tmpdlawatkow_2xtransifexCOMtxttoJSON_iloscwszystkichliniiTXTTMP) + "%]");
+
+                                string komunikat_aktualnypostep = "Trwa przygotowywanie linii nr.: " + tmpdlawatkow_2xtransifexCOMtxttoJSON_numeraktualnejlinii + "/" + tmpdlawatkow_2xtransifexCOMtxttoJSON_iloscwszystkichliniiTXTTMP + " [" + PoliczPostepWProcentach(tmpdlawatkow_2xtransifexCOMtxttoJSON_numeraktualnejlinii, tmpdlawatkow_2xtransifexCOMtxttoJSON_iloscwszystkichliniiTXTTMP) + "%]";
+
+                                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                                {
+                                    int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+                                    komunikat_aktualnypostep = "[Operacja makra: " + makro_numeroperacjiwkolejnosci + "/" + makro_operacje_lista.Count + "] " + komunikat_aktualnypostep;
+                                }
+
+                                Console.WriteLine(komunikat_aktualnypostep);
+
                             }
                             else if (wl_pasekpostepu == true)
                             {
@@ -1560,9 +1705,19 @@ namespace PWRlangConverter
                     }
                     catch (Exception Error)
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1) (Error: " + Error + ")");
-                        Console.ResetColor();
+                        string komunikat_obledzie;
+                        komunikat_obledzie = "BŁĄD: Wystąpił nieoczekiwany błąd w dostępie do plików. (TRY #1) (Error: " + Error + ")";
+
+                        if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                        {
+                            int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                            makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                        }
+
+                        Blad(komunikat_obledzie);
+
                     }
 
                     plikkeystxt_fs.Close();
@@ -1572,15 +1727,19 @@ namespace PWRlangConverter
                     {
                         File.Delete(nazwanowegoplikuJSON);
 
+                        /*
                         Console.BackgroundColor = ConsoleColor.Red;
-                        //Console.WriteLine("bledywplikuJSON: true");
+                        Console.WriteLine("bledywplikuJSON: true");
                         Console.ResetColor();
+                        */
                     }
                     else
                     {
+                        /*
                         Console.BackgroundColor = ConsoleColor.Green;
-                        //Console.WriteLine("bledywplikuJSON: false");
+                        Console.WriteLine("bledywplikuJSON: false");
                         Console.ResetColor();
+                        */
                     }
 
 
@@ -1590,18 +1749,41 @@ namespace PWRlangConverter
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!");
-                    Console.ResetColor();
+
+                    string komunikat_obledzie;
+                    komunikat_obledzie = "BŁĄD: Liczba linii w 2 plikach TXT jest nieidentyczna!";
+
+                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    {
+                        int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                        makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                    }
+
+                    Blad(komunikat_obledzie);
+
+
                 }
 
 
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("BŁĄD: Brak wskazanych plików.");
-                Console.ResetColor();
+
+                string komunikat_obledzie;
+                komunikat_obledzie = "BŁĄD: Brak wskazanych plików.";
+
+                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                {
+                    int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                    makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                }
+
+                Blad(komunikat_obledzie);
+
             }
 
 
@@ -2249,9 +2431,18 @@ namespace PWRlangConverter
                             }
                             catch (Exception Error)
                             {
-                                Console.BackgroundColor = ConsoleColor.Red;
-                                Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #2 (for-lpj2: " + lpj2 + ", Error: " + Error + ")!");
-                                Console.ResetColor();
+
+                                string komunikat_obledzie;
+                                komunikat_obledzie = "BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #2 (for-lpj2: " + lpj2 + ", Error: " + Error + ")!";
+
+                                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                                {
+                                    int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                                    makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                                }
+
                             }
 
                             plikjsonTMP_fs.Close();
@@ -2266,9 +2457,18 @@ namespace PWRlangConverter
                     }
                     catch (Exception Error)
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #1 (Error: " + Error + ")!");
-                        Console.ResetColor();
+
+                        string komunikat_obledzie;
+                        komunikat_obledzie = "BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #1 (Error: " + Error + ")!";
+
+                        if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                        {
+                            int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                            makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                        }
+
                     }
 
 
@@ -2279,6 +2479,8 @@ namespace PWRlangConverter
                     if (stopkaJSON_rezultat == true)
                     {
                         makro_pomyslnezakonczenieoperacjinr100 = true;
+
+
 
                         Console.BackgroundColor = ConsoleColor.Green;
                         Console.WriteLine("Plik JSON o nazwie \"" + nazwafinalnegoplikuJSON + "\" zostal wygenerowany.");
@@ -2361,7 +2563,17 @@ namespace PWRlangConverter
 
                 if (wl_pasekpostepu == false)
                 {
-                    Console.WriteLine("Trwa wdrażanie aktualizacji " + tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_oznaczenieaktualizacji.Replace("-", "->") + " do linii nr.: " + tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_numeraktualnejlinii + "/" + nr_ostatniej_linii + " [" + PoliczPostepWProcentach(tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_numeraktualnejlinii, nr_ostatniej_linii) + "%]");
+
+                    string komunikat_aktualnypostep = "Trwa wdrażanie aktualizacji " + tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_oznaczenieaktualizacji.Replace("-", "->") + " do linii nr.: " + tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_numeraktualnejlinii + "/" + nr_ostatniej_linii + " [" + PoliczPostepWProcentach(tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_numeraktualnejlinii, nr_ostatniej_linii) + "%]";
+
+                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    {
+                        int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+                        komunikat_aktualnypostep = "[Operacja makra: " + makro_numeroperacjiwkolejnosci + "/" + makro_operacje_lista.Count + "] " + komunikat_aktualnypostep;
+                    }
+
+                    Console.WriteLine(komunikat_aktualnypostep);
+
                 }
                 else if (wl_pasekpostepu == true)
                 {
