@@ -416,7 +416,7 @@ namespace PWRlangConverter
 
                 string numer_operacji_string;
 
-                Console.WriteLine("PWRlangConverter v.1.71 by Revok (2022)");
+                Console.WriteLine("PWRlangConverter v.1.72 by Revok (2022)");
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("---------------------------------------");
@@ -1578,7 +1578,8 @@ namespace PWRlangConverter
 
                                         .Replace("\"", "<bs_n1>")
                                         .Replace("<br>", "\\n")
-                                        .Replace("<bs_n1>", "\\\"");
+                                        .Replace("<bs_n1>", "\\\"")
+                                        .Replace("<bs_br>", "<br>");
 
 
                                         if (plikkeystxt_wartoscilinii.Length > 1)
