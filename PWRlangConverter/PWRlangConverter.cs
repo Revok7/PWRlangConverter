@@ -356,9 +356,9 @@ namespace PWRlangConverter
                               "2. Odnaleźć linię zawierającą wpis: '\"autoWprowadzanieNazwPlikowWejsciowych\": \"1\",' a jeśli wartość jest ustawiona na 0 to zmień ją na 1.\n" +
                               "3. Odnaleźć linię zawierającą wpis: '\"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",';\n" +
                               "4. Zamiast tekstu <TUTAJ_ZDEFINIUJ_MAKRO> wpisać makro, które chcemy zdefiniować (przykład poniżej).\n" +
-                              "5. Zapisać plik i uruchomić ponownie PWRlangConverter." +
-                              "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je przecinkami ','.\n" +
-                              "Na przykład zdefiniowanie makra: 1,1,1,2,2,1,0,0,2,2,1,0,100,1 spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
+                              "5. Zapisać plik i uruchomić ponownie PWRlangConverter.\n" +
+                              "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je średnikami ','.\n" +
+                              "Na przykład zdefiniowanie makra: 1;1;1;2;2;1;0;0;2;2;1;0;100;1 spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
                               "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym dla wersji gry 1.0.1c\n" +
                               "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym aktualizacji dla wersji gry x.x.x\n" +
                               "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: 1.0.1c (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
@@ -416,7 +416,7 @@ namespace PWRlangConverter
 
                 string numer_operacji_string;
 
-                Console.WriteLine("PWRlangConverter v.1.72 by Revok (2022)");
+                Console.WriteLine("PWRlangConverter v.1.73 by Revok (2022)");
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("---------------------------------------");
