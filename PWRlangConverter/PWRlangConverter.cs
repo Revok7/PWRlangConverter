@@ -416,7 +416,7 @@ namespace PWRlangConverter
 
                 string numer_operacji_string;
 
-                Console.WriteLine("PWRlangConverter v.1.73 by Revok (2022)");
+                Console.WriteLine("PWRlangConverter v.1.74 by Revok (2022)");
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("---------------------------------------");
@@ -895,17 +895,26 @@ namespace PWRlangConverter
 
                         try
                         {
-                            id_pobrane_z_tresci_pliku = int.Parse(podzial1[0].Replace("<", ""));
 
-                            if (plik_stringsTransifexCOMTXT_aktualnyidlinii == id_pobrane_z_tresci_pliku)
+                            if (podzial1[0].Contains(' ') == false)
                             {
-                                //Console.WriteLine("[Linia nr: " + plik_stringsTransifexCOMTXT_aktualnalinia + "] ID-ok");
+                                id_pobrane_z_tresci_pliku = int.Parse(podzial1[0].Replace("<", ""));
+
+                                if (plik_stringsTransifexCOMTXT_aktualnyidlinii == id_pobrane_z_tresci_pliku)
+                                {
+                                    //Console.WriteLine("[Linia nr: " + plik_stringsTransifexCOMTXT_aktualnalinia + "] ID-ok");
+                                }
+                                else
+                                {
+                                    bledy.Add(plik_stringsTransifexCOMTXT_aktualnalinia);
+
+                                    //Console.WriteLine("[Linia nr: " + plik_stringsTransifexCOMTXT_aktualnalinia + "] Błędna wartość ID w stringu! ID w tej linii powinien mieć treść <" + plik_stringsTransifexCOMTXT_aktualnyidlinii + ">");
+                                }
+
                             }
                             else
                             {
                                 bledy.Add(plik_stringsTransifexCOMTXT_aktualnalinia);
-
-                                //Console.WriteLine("[Linia nr: " + plik_stringsTransifexCOMTXT_aktualnalinia + "] Błędna wartość ID w stringu! ID w tej linii powinien mieć treść <" + plik_stringsTransifexCOMTXT_aktualnyidlinii + ">");
                             }
 
 
@@ -999,6 +1008,7 @@ namespace PWRlangConverter
                 
 
                 Blad("Znaleziono błędów w pliku: " + bledy_iloscwykrytych);
+                Blad("UWAGA: Jeśli identyfikator w danej linii się zgadza to należy skontrolować również czy nie ma nieprawidłowo wstawionych spacji (spacje przed <id> oraz w treści <id> są niedozwolone).");
 
                 for (int ib = 0; ib < bledy_iloscwykrytych; ib++)
                 {
@@ -1006,7 +1016,7 @@ namespace PWRlangConverter
                     int poprawny_identyfikator_linii = numer_linii + 3;
 
                     string komunikat_obledzie;
-                    komunikat_obledzie = "Wykryto błąd w linii nr: " + numer_linii + " (poprawny id powinien mieć treść: <" + poprawny_identyfikator_linii.ToString() + ">)";
+                    komunikat_obledzie = "Wykryto błąd w linii nr: " + numer_linii + " (poprawny id powinien mieć treść: \"<" + poprawny_identyfikator_linii.ToString() + ">\")";
 
                     if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
                     {
