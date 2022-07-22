@@ -41,11 +41,14 @@ namespace PWRlangConverter
             if (obiektrekordu == null) return false;
             else return Equals(obiektrekordu);
         }
+        
+        /*
         public int SortujRosnacoWedlugNazwy(string nazwa1, string nazwa2)
         {
 
             return nazwa1.CompareTo(nazwa2);
         }
+        */
 
         // Domyślny komparator dla typu Rekord.
         public int CompareTo(Rekord porownaniezRekordem)
@@ -57,6 +60,7 @@ namespace PWRlangConverter
             else
                 return this.ID.CompareTo(porownaniezRekordem.ID);
         }
+        
         public override int GetHashCode()
         {
             return ID;
@@ -124,6 +128,9 @@ namespace PWRlangConverter
         static List<string> tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_listaplikowjsonTMP;
         static List<int> tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_zakresindeksowOD;
         static List<int> tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_zakresindeksowDO;
+
+        static uint tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_numeraktualnejlinii = 1;
+        static string tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_oznaczeniewersji;
 
 
         static ProgressBar pasek_postepu;
@@ -295,7 +302,8 @@ namespace PWRlangConverter
         {
              return tresc_stringa.Replace("\n", "\\n")
                     .Replace("\"", "\\\"")
-                    .Replace("\t", "\\t");
+                    .Replace("\t", "\\t")
+                    .Replace("\\\\", "\\\\\\");
 
         }
 
@@ -498,7 +506,7 @@ namespace PWRlangConverter
                 Console.WriteLine("2. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON.");
                 Console.WriteLine("3. [JSON->JSON] Konwersja pliku JSON z polskimi znakami na plik bez polskich znakow.");
                 Console.WriteLine("100. [JSON+Metadane->JSON] Wdrażanie aktualizacji do pliku JSON.");
-                Console.WriteLine("101. [JSON+Metadane->FolderJSON] Dla EE");
+                Console.WriteLine("101. [JSON+Metadane->Folder JSON] Tworzenie struktury lokalizacji dla Enhanced Edition.");
                 Console.WriteLine("---------------------------------------");
                 Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
                 numer_operacji_string = Console.ReadLine();
@@ -2676,7 +2684,7 @@ namespace PWRlangConverter
                 }
                 else if (wl_pasekpostepu == true)
                 {
-                    pasek_postepu.Refresh(Convert.ToInt32(tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_numeraktualnejlinii), "Trwa wdrażanie aktualizaji...");
+                    pasek_postepu.Refresh(Convert.ToInt32(tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_numeraktualnejlinii), "Trwa wdrażanie aktualizacji...");
                 }
 
                     string _Schemat_aktualnyklucz = tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__Schemat_listakluczy[i1].ToString();
@@ -3033,7 +3041,7 @@ namespace PWRlangConverter
 
         }
 
-        public static void TworzenieStrukturyPlikowLokalizacji_Jednowatkowe(string numerporzadkowy_aktualizacji, string oznaczenie_aktualizacji) //numerporzadkowy_aktualizacji np: #2 oznaczenie_aktualizacji np: 1.0.1c-1.1.7c
+        public static void TworzenieStrukturyPlikowLokalizacji_Jednowatkowe(string numerporzadkowy_wersji, string oznaczenie_wersji) //numerporzadkowy_aktualizacji np: #2 oznaczenie_aktualizacji np: 1.0.1c-1.1.7c
         /* 
          * WYMAGA PLIKÓW METADANYCH AKTUALIZACJI WYGENEROWANYCH W PWRlangTools DO DZIAŁANIA. PLIKI TE MUSZĄ ZOSTAĆ UMIESZCZONE W FOLDERZE "PWRlangConverter\update\":
          * - <oznaczenie_wersji>.UpdateLocStruct.json
@@ -3047,11 +3055,13 @@ namespace PWRlangConverter
             /* USUWANIE FOLDERU TMP WRAZ Z ZAWARTOŚCIĄ (JEŚLI ISTNIEJE) - KONIEC */
 
 
-            const int ilosc_watkow = 1;
+            //const int ilosc_watkow = 1;
 
-            string[] oa = oznaczenie_aktualizacji.Split(new char[] { '-' });
-            string numer_starej_wersji = oa[0];
-            string numer_nowej_wersji = oa[1];
+            tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_oznaczeniewersji = oznaczenie_wersji;
+
+            string[] ow = oznaczenie_wersji.Split(new char[] { '-' });
+            string numer_starej_wersji = ow[0];
+            string numer_nowej_wersji = ow[1];
 
             string folderupdate = folderglownyprogramu + "//" + "update";
 
@@ -3088,9 +3098,9 @@ namespace PWRlangConverter
 
                 }
 
-                plikUpdateLocStructJSON_nazwa = numerporzadkowy_aktualizacji + "_" + oznaczenie_aktualizacji + ".UpdateLocStruct.json";
+                plikUpdateLocStructJSON_nazwa = numerporzadkowy_wersji + "_" + oznaczenie_wersji + ".UpdateLocStruct.json";
 
-                Console.WriteLine("Podano nazwę pliku .UpdateLocStruct.json dla aktualizacji " + oznaczenie_aktualizacji + ": " + plikUpdateLocStructJSON_nazwa);
+                Console.WriteLine("Podano nazwę pliku .UpdateLocStruct.json dla aktualizacji " + oznaczenie_wersji + ": " + plikUpdateLocStructJSON_nazwa);
                 Console.WriteLine("Podano nazwę pliku json lokalizacji w wersji " + numer_nowej_wersji + ", który zostanie wykorzystany do utworzenia struktury lokalizacji: " + plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa);
 
                 if (
@@ -3100,6 +3110,8 @@ namespace PWRlangConverter
                 {
                     if (PoliczLiczbeLinii(folderupdate + "//" + plikUpdateLocStructJSON_nazwa) == PoliczLiczbeLinii(plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa))
                     {
+                        Console.WriteLine("Trwa segregowanie danych przed właściwym tworzeniem struktury lokalizacji...");
+                        Console.WriteLine("Proszę czekać...");
 
                         dynamic[] _StrukturaLokalizacji_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateLocStructJSON_nazwa);
                         dynamic[] _BazaDlaStruktury_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa);
@@ -3132,7 +3144,7 @@ namespace PWRlangConverter
 
                         List<Rekord> struktura_dane = new List<Rekord>();
 
-                        Informacja("_BazaDlaStruktury_listakluczy.Count(): " + _BazaDlaStruktury_listakluczy.Count());
+                        //Informacja("_BazaDlaStruktury_listakluczy.Count(): " + _BazaDlaStruktury_listakluczy.Count());
 
                         for (int i1 = 0; i1 < _BazaDlaStruktury_listakluczy.Count(); i1++)
                         {
@@ -3145,7 +3157,7 @@ namespace PWRlangConverter
                                     int _ID = i1 - 2;
                                     string _Plik = _StrukturaLokalizacji[i1][i2].ToString();
                                     string _Klucz = _BazaDlaStruktury_listakluczy[i1];
-                                    string _String = FiltrujString(_BazaDlaStruktury[i1][i2]);
+                                    string _String = _BazaDlaStruktury[i1][i2];
 
                                     //Console.WriteLine(_ID + "|" + _Plik + "|" + _Klucz + "|" + _String);
 
@@ -3155,6 +3167,13 @@ namespace PWRlangConverter
                             }
                         }
 
+
+
+                        //Informacja(struktura_dane.Count().ToString());
+
+                        TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_Operacje(NOWYfolderlokalizacji_nazwa, struktura_dane);
+
+                        Sukces("Struktura lokalizacji została pomyślnie zapisana w Folderze JSON o nazwie \"" + NOWYfolderlokalizacji_nazwa + "\".");
 
 
                         /*
@@ -3191,9 +3210,7 @@ namespace PWRlangConverter
                         // test dodawania danych do listy i sortowania - KONIEC
                         */
 
-                        Informacja(struktura_dane.Count().ToString());
 
-                        TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_Operacje(NOWYfolderlokalizacji_nazwa, struktura_dane);
 
 
                         /*
@@ -3485,7 +3502,8 @@ namespace PWRlangConverter
             //string lancuch_tmpnazwysegregowanychplikow = ""; //nazwa_pliku1;nazwa_pliku2;nazwa_pliku3 itd.
             List<List<Rekord>> lista_list_danych_1_konkretnego_pliku = new List<List<Rekord>>();
             string lancuch_wszystkichplikow = "";
-            
+
+            int nr_ostatniej_linii = 1;
             //tworzenie łańcucha zawierającego wszystkie nazwy plikow w struktura_danych
             for (int tl1 = 0; tl1 < struktura_dane.Count(); tl1++)
             {
@@ -3493,10 +3511,12 @@ namespace PWRlangConverter
                 {
                     lancuch_wszystkichplikow = lancuch_wszystkichplikow + struktura_dane[tl1].Plik + ";";
                 }
+
+                nr_ostatniej_linii++;
             }
 
             string[] lancuch_wszystkichplikow_Split = lancuch_wszystkichplikow.TrimEnd(new char[] { ';' }).Split(';');
-            Informacja("lancuch_wszystkichplikow_Split.Length:" + lancuch_wszystkichplikow_Split.Length);
+            //Informacja("lancuch_wszystkichplikow_Split.Length:" + lancuch_wszystkichplikow_Split.Length);
             for (int tl2 = 0; tl2 < lancuch_wszystkichplikow_Split.Length; tl2++)
             {
                 //Console.WriteLine(lancuch_wszystkichplikow_Split[tl2]);
@@ -3516,14 +3536,34 @@ namespace PWRlangConverter
             }
 
 
-            Informacja("lista_list_danych_1_konkretnego_pliku.Count(): " + lista_list_danych_1_konkretnego_pliku.Count());
+            //Informacja("lista_list_danych_1_konkretnego_pliku.Count(): " + lista_list_danych_1_konkretnego_pliku.Count());
 
             for (int tl3 = 0; tl3 < lista_list_danych_1_konkretnego_pliku.Count(); tl3++)
             {
-                Informacja("lista_list_danych_1_konkretnego_pliku[tl3].Count(): " + lista_list_danych_1_konkretnego_pliku[tl3].Count());
+
+                //Informacja("lista_list_danych_1_konkretnego_pliku[tl3].Count(): " + lista_list_danych_1_konkretnego_pliku[tl3].Count());
 
                 for (int tl4 = 0; tl4 < lista_list_danych_1_konkretnego_pliku[tl3].Count(); tl4++)
                 {
+                    if (wl_pasekpostepu == false)
+                    {
+
+                        string komunikat_aktualnypostep = "Trwa tworzenie struktury lokalizacji dla wersji " + tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_oznaczeniewersji.Split("-")[1] + ": " + tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_numeraktualnejlinii + "/" + nr_ostatniej_linii + " [" + PoliczPostepWProcentach(tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_numeraktualnejlinii, nr_ostatniej_linii) + "%]";
+
+                        if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                        {
+                            int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+                            komunikat_aktualnypostep = "[Operacja makra: " + makro_numeroperacjiwkolejnosci + "/" + makro_operacje_lista.Count + "] " + komunikat_aktualnypostep;
+                        }
+
+                        Console.WriteLine(komunikat_aktualnypostep);
+
+                    }
+                    else if (wl_pasekpostepu == true)
+                    {
+                        pasek_postepu.Refresh(Convert.ToInt32(tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_numeraktualnejlinii), "Trwa tworzenie struktury lokalizacji...");
+                    }
+
                     string lista_tmpnazwotwartychplikow = ""; //nazwa_pliku1;nazwa_pliku2;nazwa_pliku3 itd.
                     List<string> lista_nazwotwartychplikow = new List<string>();
                     List<FileStream> lista_otwartychplikow_fs = new List<FileStream>();
@@ -3536,7 +3576,7 @@ namespace PWRlangConverter
                         int _ID = lista_list_danych_1_konkretnego_pliku[tl3][isd].ID;
                         string _Plik = lista_list_danych_1_konkretnego_pliku[tl3][isd].Plik;
                         string _Klucz = lista_list_danych_1_konkretnego_pliku[tl3][isd].Klucz;
-                        string _String = FiltrujString(lista_list_danych_1_konkretnego_pliku[tl3][isd].String);
+                        string _String = lista_list_danych_1_konkretnego_pliku[tl3][isd].String;
 
                         if (lista_tmpnazwotwartychplikow.Contains(_Plik) == true)
                         {
@@ -3570,17 +3610,18 @@ namespace PWRlangConverter
 
                         }
 
-
+                        
 
                     }
 
                     //zapisywanie danych w plikach
                     string tmp_nazwaplikuzostatniejlinii = "";
 
-                    Informacja("lista_liniidozapisuwpliku.Count(): " + lista_liniidozapisuwpliku.Count());
+                    //Informacja("lista_liniidozapisuwpliku.Count(): " + lista_liniidozapisuwpliku.Count());
 
                     for (int isd2 = 0; isd2 < lista_liniidozapisuwpliku.Count(); isd2++)
                     {
+
                         StreamWriter OtwartyStrumienZapisuDoPliku = lista_liniidozapisuwpliku[isd2].OtwartyStrumienZapisuDoPliku;
                         string _Plik = lista_liniidozapisuwpliku[isd2].Plik;
                         string _Klucz = lista_liniidozapisuwpliku[isd2].Klucz;
@@ -3603,7 +3644,11 @@ namespace PWRlangConverter
 
                         tmp_nazwaplikuzostatniejlinii = _Plik;
 
+
                     }
+
+                    tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_numeraktualnejlinii++;
+
 
                     //zamykanie strumieni zapisów do plików, plików i tworzenie stopek
                     for (int isd3 = 0; isd3 < lista_otwartychstrumienizapisudoplikow_sw.Count(); isd3++)
@@ -3624,8 +3669,8 @@ namespace PWRlangConverter
 
                 }
 
+
             }
-            
 
 
         }
