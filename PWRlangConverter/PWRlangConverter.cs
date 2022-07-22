@@ -99,6 +99,7 @@ namespace PWRlangConverter
         static bool makro_aktywowane;
         static bool makro_pomyslnezakonczenieoperacjinr2 = false;
         static bool makro_pomyslnezakonczenieoperacjinr100 = false;
+        static bool makro_pomyslnezakonczenieoperacjinr101 = false;
         static List<string> makro_bledy_lista = new List<string>(); //element listy: "makro_numeroperacjiwkolejnosci;komunikat_obledzie"
         static List<string> makro_sukcesy_lista = new List<string>(); //element listy: "makro_numeroperacjiwkolejnosci;komunikat_osukcesie"
 
@@ -314,6 +315,7 @@ namespace PWRlangConverter
                 //reset zmiennych po poprzednich operacjach
                 makro_pomyslnezakonczenieoperacjinr2 = false;
                 makro_pomyslnezakonczenieoperacjinr100 = false;
+                makro_pomyslnezakonczenieoperacjinr101 = false;
 
                 int makro_sprawdzeniekolejnejoperacji = makro_aktualny_indeks_listy + 1;
 
@@ -335,6 +337,11 @@ namespace PWRlangConverter
                     {
                         WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych();
                     }
+                    else if (makro_operacjadowykonania == 101)
+                    {
+                        TworzenieStrukturyPlikowLokalizacji_WeryfikacjaPlikowUpdateLocStruct();
+                    }
+
 
                 }
                 else
@@ -445,7 +452,7 @@ namespace PWRlangConverter
                               "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: 1.0.1c (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
                               "-Konwersja pliku aktualizacji lokalizacji TXT->JSON dla wersji gry: x.x.x (z dołączeniem numerów porządkowych, ale bez dołączenia numerów/id linii)\n" +
                               "-Wdrażanie aktualizacji do pliku lokalizacji 1.0.1c->x.x.x\n" +
-                              "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2 i 100 tj. weryfikacji, konwersji TXT->JSON i wdrażania aktualizacji.\n" +
+                              "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2, 100 o 101 tj. weryfikacji, konwersji TXT->JSON, wdrażania aktualizacji i tworzenia struktury lokalizacji.\n" +
                               "UWAGA2: Pierwsza operacja makra musi zostać zdefiniowana jako: 1 (tj. weryfikacja).\n" +
                               "UWAGA3: Zaleca się definiowanie makra w taki sposób aby w pierwszej kolejności wykonywać operacje weryfikacji (1) dla wszystkich plików po kolei, następnie konwersję (2) dla wszystkich plików, a na końcu wdrażanie aktualizacji (100) po kolei dla wszystkich plików.");
 
@@ -3084,14 +3091,12 @@ namespace PWRlangConverter
 
                 Directory.CreateDirectory(NOWYfolderlokalizacji_nazwa);
 
-                if (cfg.autoWprowadzanieNazwPlikowWejsciowych == "1")
+                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
                 {
-                    //pliklokalizacjistarejwersji_nazwa = "NOWY_plPL-" + numer_starej_wersji + ".json";
-                    //pliklokalizacjizaktualizacjadonowejwersji_nazwa = "NOWY_plPL-update-" + oznaczenie_aktualizacji + ".json";
+                    plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa = "NOWY_plPL-" + numer_nowej_wersji + ".json";
                 }
                 else
                 {
-
 
                     Console.Write("Podaj nazwę pliku json lokalizacji w wersji " + numer_nowej_wersji + ", który chcesz wykorzystać do utworzenia struktury lokalizacji: ");
                     plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa = Console.ReadLine();
@@ -3175,6 +3180,7 @@ namespace PWRlangConverter
 
                         Sukces("Struktura lokalizacji została pomyślnie zapisana w Folderze JSON o nazwie \"" + NOWYfolderlokalizacji_nazwa + "\".");
 
+                        makro_pomyslnezakonczenieoperacjinr101 = true;
 
                         /*
                         // test dodawania danych do listy i sortowania - POCZĄTEK
@@ -3459,28 +3465,13 @@ namespace PWRlangConverter
 
 
 
-            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1 && makro_pomyslnezakonczenieoperacjinr100 == true)
+            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1 && makro_pomyslnezakonczenieoperacjinr101 == true)
             {
-                /*
+                
                 //czyszczenie pamięci dodatkowej jeśli makro jest aktywne
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_numeraktualnejlinii = 1;
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_oznaczenieaktualizacji = "";
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__Schemat_tablicalistdanych = null;
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__StrukturaLokalizacji_tablicalistdanych = null;
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiStarejWersji_tablicalistdanych = null;
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiZAktualizacjaDoNowejWersji_tablicalistdanych = null;
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__Schemat_listakluczy.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__StrukturaLokalizacji_listakluczy.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiStarejWersji_listakluczy.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiZAktualizacjaDoNowejWersji_listakluczy.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__StrukturaLokalizacji.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiStarejWersji_listastringow.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__PlikLokalizacjiZAktualizacjaDoNowejWersji_listastringow.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_iloscwszystkichkluczyplikuUpdateSchemaJSONTMP = 0;
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_listaplikowjsonTMP.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_zakresindeksowOD.Clear();
-                tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_zakresindeksowDO.Clear();
-                */
+                tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_numeraktualnejlinii = 1;
+                tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_oznaczeniewersji = "";
+                
 
                 Makro_UruchomienieKolejnejOperacji();
             }

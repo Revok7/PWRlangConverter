@@ -28,6 +28,7 @@ namespace PWRlangConverter
         public string domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT { get; set; }
         public string domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON { get; set; }
 
+
         const string skrypt = "konfiguracja.cs";
 
         public static void WygenerujDomyslnyPlikKonfiguracyjnyJesliNieIstnieje()
@@ -40,16 +41,21 @@ namespace PWRlangConverter
                 //DOMYŚLNE WARTOŚCI KONFIGURACJI, GDY BRAK PLIKU CFG.JSON W FOLDERZE Z PROGRAMEM
                 plikCFGdomyslny_sw.WriteLine("{");
 
+
+
                 plikCFGdomyslny_sw.WriteLine("      \"autoWprowadzanieNazwPlikowWejsciowych\": \"0\",");
                 plikCFGdomyslny_sw.WriteLine("      \"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTZTransifexCOM\": \"\",");
-                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM\": \"\",");
+                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM\": \"for_use_%NUMER_PORZADKOWY_AKTUALIZACJI%-pwr_pl-korekta-aktualizacji-%OZNACZENIE_AKTUALIZACJI%_engb-update-%OZNACZENIE_AKTUALIZACJI%jsonstringstransifexcomtxt_pl.txt\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikukeysTransifexCOMTXT\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikustringsTransifexCOMTXT\": \"\",");
-                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON\": \"\",");
-                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT\": \"\",");
+                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT\": \"plPL-update-%OZNACZENIE_AKTUALIZACJI%.json.keysTransifexCOM.txt\",");
+                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON\": \"NOWY_plPL-9.0.0.json\"");
+
+
 
                 plikCFGdomyslny_sw.WriteLine("      \"__domyslnyPlikKonfiguracyjny\": \"1\"");
+
                 plikCFGdomyslny_sw.WriteLine("}");
                 plikCFGdomyslny_sw.Close();
                 plikCFGdomyslny_fs.Close();
