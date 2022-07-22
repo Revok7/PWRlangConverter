@@ -2968,7 +2968,7 @@ namespace PWRlangConverter
                 if (istniejacenazwyplikowmetadanych.Count > 0 && lista_oznaczen_aktualizacji.Count > 0)
                 {
                     string numer_pozycji_string;
-                    Console.Write("Wpisz numer pozycji aktualizacji, którą chcesz wdrożyć: ");
+                    Console.Write("Wpisz numer pozycji wersji, dla której chcesz utworzyć strukturę lokalizacji: ");
 
                     if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
                     {
@@ -3093,6 +3093,7 @@ namespace PWRlangConverter
 
                 if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
                 {
+                    
                     plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa = "NOWY_plPL-" + numer_nowej_wersji + ".json";
                 }
                 else
