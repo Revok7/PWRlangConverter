@@ -2939,7 +2939,7 @@ namespace PWRlangConverter
             {
                 List<string> istniejacenazwyplikowmetadanych = PobierzNazwyPlikowJSONzFolderu("update");
 
-                List<string> lista_oznaczen_aktualizacji = new List<string>();
+                List<string> lista_oznaczen_wersji = new List<string>();
 
                 int np = 1;
                 for (int i = 0; i < istniejacenazwyplikowmetadanych.Count; i++)
@@ -2948,15 +2948,18 @@ namespace PWRlangConverter
 
                     if (istniejacenazwyplikowmetadanych[i].Contains(przyrostek_UpdateLocStruct) == true)
                     {
-                        string oznaczenie_aktualizacji = istniejacenazwyplikowmetadanych[i].Split(new string[] { ".Update" }, StringSplitOptions.None)[0];
+                        string oznaczenie_wersji = istniejacenazwyplikowmetadanych[i].Split(new string[] { ".Update" }, StringSplitOptions.None)[0];
 
                         //Console.WriteLine("Oznaczenie aktualizacji: " + oznaczenie_aktualizacji);
 
-                        if (File.Exists(folderupdate + "//" + oznaczenie_aktualizacji + przyrostek_UpdateLocStruct) == true)
+                        if (File.Exists(folderupdate + "//" + oznaczenie_wersji + przyrostek_UpdateLocStruct) == true)
                         {
-                            lista_oznaczen_aktualizacji.Add(oznaczenie_aktualizacji);
+                            lista_oznaczen_wersji.Add(oznaczenie_wersji);
 
-                            Console.WriteLine(np + ". " + oznaczenie_aktualizacji.Replace("-", "->"));
+                            string ow = oznaczenie_wersji.Split(new char[] { '_' })[1];
+                            string oznaczenie_nowej_wersji = ow.Split(new char[] { '-' })[1];
+
+                            Console.WriteLine(np + ". " + oznaczenie_nowej_wersji);
 
                             np++;
                         }
@@ -2965,7 +2968,7 @@ namespace PWRlangConverter
 
                 }
 
-                if (istniejacenazwyplikowmetadanych.Count > 0 && lista_oznaczen_aktualizacji.Count > 0)
+                if (istniejacenazwyplikowmetadanych.Count > 0 && lista_oznaczen_wersji.Count > 0)
                 {
                     string numer_pozycji_string;
                     Console.Write("Wpisz numer pozycji wersji, dla której chcesz utworzyć strukturę lokalizacji: ");
@@ -2985,12 +2988,12 @@ namespace PWRlangConverter
 
                     if (CzyParsowanieINTUdane(numer_pozycji_string))
                     {
-                        int indeks_oznaczeniaaktualizacji = (int.Parse(numer_pozycji_string)) - 1;
+                        int indeks_oznaczeniawersji = (int.Parse(numer_pozycji_string)) - 1;
 
-                        if ((indeks_oznaczeniaaktualizacji >= 0) && (lista_oznaczen_aktualizacji.Count - 1 >= indeks_oznaczeniaaktualizacji))
+                        if ((indeks_oznaczeniawersji >= 0) && (lista_oznaczen_wersji.Count - 1 >= indeks_oznaczeniawersji))
                         {
 
-                            string[] tmp2_loa = lista_oznaczen_aktualizacji[indeks_oznaczeniaaktualizacji].Split(new char[] { '_' });
+                            string[] tmp2_loa = lista_oznaczen_wersji[indeks_oznaczeniawersji].Split(new char[] { '_' });
 
                             if (tmp2_loa.Length >= 2)
                             {
