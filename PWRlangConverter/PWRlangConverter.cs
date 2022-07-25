@@ -3094,7 +3094,7 @@ namespace PWRlangConverter
 
                 Directory.CreateDirectory(NOWYfolderlokalizacji_nazwa);
 
-                if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                if ((makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1) || int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
                 {
                     
                     plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa = "NOWY_plPL-" + numer_nowej_wersji + ".json";
