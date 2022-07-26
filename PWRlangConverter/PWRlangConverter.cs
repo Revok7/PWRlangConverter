@@ -3601,7 +3601,7 @@ namespace PWRlangConverter
             //zapisywanie danych w plikach
             string tmp_nazwaplikuzostatniejlinii = "";
 
-            Informacja("lista_list_liniidozapisuwpliku.Count(): " + lista_list_liniidozapisuwpliku.Count());
+            //Informacja("lista_list_liniidozapisuwpliku.Count(): " + lista_list_liniidozapisuwpliku.Count());
 
             for (int isd2 = 0; isd2 < lista_list_liniidozapisuwpliku.Count(); isd2++)
             {
