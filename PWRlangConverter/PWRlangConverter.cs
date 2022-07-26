@@ -3531,15 +3531,83 @@ namespace PWRlangConverter
             }
 
 
+
+            string lista_tmpnazwotwartychplikow = ""; //nazwa_pliku1;nazwa_pliku2;nazwa_pliku3 itd.
+            List<string> lista_nazwotwartychplikow = new List<string>();
+            List<FileStream> lista_otwartychplikow_fs = new List<FileStream>();
+            List<StreamWriter> lista_otwartychstrumienizapisudoplikow_sw = new List<StreamWriter>();
+            List<List<Linia>> lista_list_liniidozapisuwpliku = new List<List<Linia>>();
+
+
             //Informacja("lista_list_danych_1_konkretnego_pliku.Count(): " + lista_list_danych_1_konkretnego_pliku.Count());
 
             for (int tl3 = 0; tl3 < lista_list_danych_1_konkretnego_pliku.Count(); tl3++)
             {
+                List<Linia> lista_liniidozapisuwpliku = new List<Linia>();
 
                 //Informacja("lista_list_danych_1_konkretnego_pliku[tl3].Count(): " + lista_list_danych_1_konkretnego_pliku[tl3].Count());
 
                 for (int tl4 = 0; tl4 < lista_list_danych_1_konkretnego_pliku[tl3].Count(); tl4++)
                 {
+
+
+                    int _ID = lista_list_danych_1_konkretnego_pliku[tl3][tl4].ID;
+                    string _Plik = lista_list_danych_1_konkretnego_pliku[tl3][tl4].Plik;
+                    string _Klucz = lista_list_danych_1_konkretnego_pliku[tl3][tl4].Klucz;
+                    string _String = lista_list_danych_1_konkretnego_pliku[tl3][tl4].String;
+
+                    if (lista_tmpnazwotwartychplikow.Contains(_Plik) == true)
+                    {
+
+                        lista_liniidozapisuwpliku.Add(new Linia { OtwartyStrumienZapisuDoPliku = lista_otwartychstrumienizapisudoplikow_sw.Last(), Plik = _Plik, Klucz = _Klucz, String = _String });
+
+                    }
+                    else if (lista_tmpnazwotwartychplikow.Contains(_Plik) == false)
+                    {
+
+                        UtworzNaglowekJSON(NOWYfolderlokalizacji_nazwa + "//" + _Plik);
+
+                        FileStream danypliklokalizacji_fs = new FileStream(NOWYfolderlokalizacji_nazwa + "//" + _Plik, FileMode.Append, FileAccess.Write);
+                        lista_otwartychplikow_fs.Add(danypliklokalizacji_fs);
+
+                        try
+                        {
+                            StreamWriter danypliklokalizacji_sw = new StreamWriter(danypliklokalizacji_fs);
+
+                            lista_liniidozapisuwpliku.Add(new Linia { OtwartyStrumienZapisuDoPliku = danypliklokalizacji_sw, Plik = _Plik, Klucz = _Klucz, String = _String });
+
+                            lista_otwartychstrumienizapisudoplikow_sw.Add(danypliklokalizacji_sw);
+                        }
+                        catch
+                        {
+                            Blad("Wystąpił nieoczekiwany błąd w strumieniu zapisu do pliku: " + _Plik + " (tl3: " + tl3 +", tl4: " + tl4 + ")");
+                        }
+
+                        lista_tmpnazwotwartychplikow = lista_tmpnazwotwartychplikow + _Plik + ";";
+                        lista_nazwotwartychplikow.Add(_Plik);
+
+                    }
+
+
+                }
+
+                lista_list_liniidozapisuwpliku.Add(lista_liniidozapisuwpliku);
+
+
+
+            }
+
+
+            //zapisywanie danych w plikach
+            string tmp_nazwaplikuzostatniejlinii = "";
+
+            Informacja("lista_list_liniidozapisuwpliku.Count(): " + lista_list_liniidozapisuwpliku.Count());
+
+            for (int isd2 = 0; isd2 < lista_list_liniidozapisuwpliku.Count(); isd2++)
+            {
+                for (int isd2b = 0; isd2b < lista_list_liniidozapisuwpliku[isd2].Count(); isd2b++)
+                {
+
                     if (wl_pasekpostepu == false)
                     {
 
@@ -3559,113 +3627,53 @@ namespace PWRlangConverter
                         pasek_postepu.Refresh(Convert.ToInt32(tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_numeraktualnejlinii), "Trwa tworzenie struktury lokalizacji...");
                     }
 
-                    string lista_tmpnazwotwartychplikow = ""; //nazwa_pliku1;nazwa_pliku2;nazwa_pliku3 itd.
-                    List<string> lista_nazwotwartychplikow = new List<string>();
-                    List<FileStream> lista_otwartychplikow_fs = new List<FileStream>();
-                    List<StreamWriter> lista_otwartychstrumienizapisudoplikow_sw = new List<StreamWriter>();
-                    List<Linia> lista_liniidozapisuwpliku = new List<Linia>();
 
-                    //tworzenie plików, dodanie do nich nagłówków JSON, otwarcie i inicjalizacja strumieni zapisu
-                    for (int isd = 0; isd < lista_list_danych_1_konkretnego_pliku[tl3].Count(); isd++)
+                    StreamWriter OtwartyStrumienZapisuDoPliku = lista_list_liniidozapisuwpliku[isd2][isd2b].OtwartyStrumienZapisuDoPliku;
+                    string _Plik_zapis = lista_list_liniidozapisuwpliku[isd2][isd2b].Plik;
+                    string _Klucz_zapis = lista_list_liniidozapisuwpliku[isd2][isd2b].Klucz;
+                    string _String_zapis = FiltrujString(lista_list_liniidozapisuwpliku[isd2][isd2b].String);
+
+
+
+                    OtwartyStrumienZapisuDoPliku.Write("    \"" + _Klucz_zapis + "\": \"" + _String_zapis + "\"");
+
+
+                    if (isd2b + 1 != lista_list_liniidozapisuwpliku[isd2].Count())
                     {
-                        int _ID = lista_list_danych_1_konkretnego_pliku[tl3][isd].ID;
-                        string _Plik = lista_list_danych_1_konkretnego_pliku[tl3][isd].Plik;
-                        string _Klucz = lista_list_danych_1_konkretnego_pliku[tl3][isd].Klucz;
-                        string _String = lista_list_danych_1_konkretnego_pliku[tl3][isd].String;
-
-                        if (lista_tmpnazwotwartychplikow.Contains(_Plik) == true)
-                        {
-
-                            lista_liniidozapisuwpliku.Add(new Linia { OtwartyStrumienZapisuDoPliku = lista_otwartychstrumienizapisudoplikow_sw.Last(), Plik = _Plik, Klucz = _Klucz, String = _String });
-
-                        }
-                        else if (lista_tmpnazwotwartychplikow.Contains(_Plik) == false)
-                        {
-
-                            UtworzNaglowekJSON(NOWYfolderlokalizacji_nazwa + "//" + _Plik);
-
-                            FileStream danypliklokalizacji_fs = new FileStream(NOWYfolderlokalizacji_nazwa + "//" + _Plik, FileMode.Append, FileAccess.Write);
-                            lista_otwartychplikow_fs.Add(danypliklokalizacji_fs);
-
-                            try
-                            {
-                                StreamWriter danypliklokalizacji_sw = new StreamWriter(danypliklokalizacji_fs);
-
-                                lista_liniidozapisuwpliku.Add(new Linia { OtwartyStrumienZapisuDoPliku = danypliklokalizacji_sw, Plik = _Plik, Klucz = _Klucz, String = _String });
-
-                                lista_otwartychstrumienizapisudoplikow_sw.Add(danypliklokalizacji_sw);
-                            }
-                            catch
-                            {
-                                Blad("Wystąpił nieoczekiwany błąd w strumieniu zapisu do pliku: " + _Plik + " (tl3: " + tl3 +", tl4: " + tl4 + ", isd: " + isd + ")");
-                            }
-
-                            lista_tmpnazwotwartychplikow = lista_tmpnazwotwartychplikow + _Plik + ";";
-                            lista_nazwotwartychplikow.Add(_Plik);
-
-                        }
-
-                        
-
+                        OtwartyStrumienZapisuDoPliku.Write(",");
                     }
 
-                    //zapisywanie danych w plikach
-                    string tmp_nazwaplikuzostatniejlinii = "";
-
-                    //Informacja("lista_liniidozapisuwpliku.Count(): " + lista_liniidozapisuwpliku.Count());
-
-                    for (int isd2 = 0; isd2 < lista_liniidozapisuwpliku.Count(); isd2++)
-                    {
-
-                        StreamWriter OtwartyStrumienZapisuDoPliku = lista_liniidozapisuwpliku[isd2].OtwartyStrumienZapisuDoPliku;
-                        string _Plik = lista_liniidozapisuwpliku[isd2].Plik;
-                        string _Klucz = lista_liniidozapisuwpliku[isd2].Klucz;
-                        string _String = FiltrujString(lista_liniidozapisuwpliku[isd2].String);
-
-                        //Console.WriteLine("tmp_nazwaplikuzostatniejlinii: " + tmp_nazwaplikuzostatniejlinii + " (isd2=" + isd2 + ")");
-                        //Console.WriteLine(tmp_nazwaplikuzostatniejlinii + " vs " + _Plik);
+                    OtwartyStrumienZapisuDoPliku.Write("\n");
 
 
-                        OtwartyStrumienZapisuDoPliku.Write("    \"" + _Klucz + "\": \"" + _String + "\"");
-
-                        if (isd2 + 1 != lista_liniidozapisuwpliku.Count())
-                        {
-                            OtwartyStrumienZapisuDoPliku.Write(",");
-                        }
-
-                        OtwartyStrumienZapisuDoPliku.Write("\n");
-
-                        //Console.WriteLine("isd2=" + (isd2 + 1) + " vs " + lista_liniidozapisuwpliku.Count());
-
-                        tmp_nazwaplikuzostatniejlinii = _Plik;
+                    tmp_nazwaplikuzostatniejlinii = _Plik_zapis;
 
 
-                    }
 
                     tmpdlawatkow_TworzenieStrukturyPlikowLokalizacji_Jednowatkowe_numeraktualnejlinii++;
 
-
-                    //zamykanie strumieni zapisów do plików, plików i tworzenie stopek
-                    for (int isd3 = 0; isd3 < lista_otwartychstrumienizapisudoplikow_sw.Count(); isd3++)
-                    {
-                        lista_otwartychstrumienizapisudoplikow_sw[isd3].Close();
-                        lista_otwartychplikow_fs[isd3].Close();
-
-                        UtworzStopkeJSON(NOWYfolderlokalizacji_nazwa + "//" + lista_nazwotwartychplikow[isd3]);
-                    }
-
-                    //czyszczenie danych
-                    lista_tmpnazwotwartychplikow = "";
-                    lista_nazwotwartychplikow.Clear();
-                    lista_otwartychplikow_fs.Clear();
-                    lista_otwartychstrumienizapisudoplikow_sw.Clear();
-                    lista_liniidozapisuwpliku.Clear();
-
-
                 }
 
-
             }
+            
+
+
+
+            //zamykanie strumieni zapisów do plików, plików i tworzenie stopek
+            for (int isd3 = 0; isd3 < lista_otwartychstrumienizapisudoplikow_sw.Count(); isd3++)
+            {
+                lista_otwartychstrumienizapisudoplikow_sw[isd3].Close();
+                lista_otwartychplikow_fs[isd3].Close();
+
+                UtworzStopkeJSON(NOWYfolderlokalizacji_nazwa + "//" + lista_nazwotwartychplikow[isd3]);
+            }
+
+            //czyszczenie danych
+            lista_tmpnazwotwartychplikow = "";
+            lista_nazwotwartychplikow.Clear();
+            lista_otwartychplikow_fs.Clear();
+            lista_otwartychstrumienizapisudoplikow_sw.Clear();
+            lista_list_liniidozapisuwpliku.Clear();
 
 
         }
