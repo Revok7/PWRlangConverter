@@ -735,7 +735,7 @@ namespace PWRlangConverter
 
         public static void WeryfikacjaPlikowMetadanych(string nazwa_metody_ktora_ma_zostac_uruchomiona)
         {
-            Console.WriteLine("1. #1_1.0.1c");
+            Console.WriteLine("1. #01_1.0.1c");
 
             string folderupdate = folderglownyprogramu + "//" + "update";
             string przyrostek_UpdateLocStruct = ".UpdateLocStruct.json";
