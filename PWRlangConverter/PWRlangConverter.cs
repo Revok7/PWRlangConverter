@@ -504,7 +504,7 @@ namespace PWRlangConverter
 
                 string numer_operacji_string;
 
-                Console.WriteLine("PWRlangConverter v.1.80 by Revok (2022)");
+                Console.WriteLine("PWRlangConverter v.1.81 by Revok (2022)");
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("---------------------------------------");
@@ -1578,7 +1578,7 @@ namespace PWRlangConverter
 
         public static void TXTTransifexCOMtoJSON_ZNumeramiLiniiZPlikuJSON_Operacje(string nazwaplikukeystxt, string nazwaplikustringstxt, bool ostatni_watek = false)
         {
-
+            int wielkiznakPL_rozmiar = int.Parse(cfg.narzucRozmiarWProcentachDlaWielkichZnakowPL);
             //string nazwaplikukeystxt;
             //string nazwaplikustringstxt;
             string nazwanowegoplikuJSON;
@@ -1676,13 +1676,23 @@ namespace PWRlangConverter
                                         List<string> lista_zmiennych_linii = new List<string>();
 
 
-
                                         plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
 
                                         .Replace("\"", "<bs_n1>")
                                         .Replace("<br>", "\\n")
                                         .Replace("<bs_n1>", "\\\"")
                                         .Replace("<bs_br>", "<br>");
+
+                                        if (wielkiznakPL_rozmiar != 100)
+                                        {
+                                            plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
+                                                .Replace("Ś", "<size=" + wielkiznakPL_rozmiar + "%>Ś</size>")
+                                                .Replace("Ż", "<size=" + wielkiznakPL_rozmiar + "%>Ż</size>")
+                                                .Replace("Ź", "<size=" + wielkiznakPL_rozmiar + "%>Ź</size>")
+                                                .Replace("Ć", "<size=" + wielkiznakPL_rozmiar + "%>Ć</size>")
+                                                .Replace("Ń", "<size=" + wielkiznakPL_rozmiar + "%>Ń</size>");
+
+                                        }
 
 
                                         if (plikkeystxt_wartoscilinii.Length > 1)
