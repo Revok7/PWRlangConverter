@@ -1675,6 +1675,40 @@ namespace PWRlangConverter
 
                                         List<string> lista_zmiennych_linii = new List<string>();
 
+                                        int plikstringstxt_trescuaktualnionalinii_iloscznakow = plikstringstxt_trescuaktualnionalinii.Length;
+
+                                        if ((plikstringstxt_trescuaktualnionalinii_iloscznakow <= 25)
+                                            && (
+                                                    plikstringstxt_trescuaktualnionalinii.Contains("Ś") == true
+                                                    ||
+                                                    plikstringstxt_trescuaktualnionalinii.Contains("Ż") == true
+                                                    ||
+                                                    plikstringstxt_trescuaktualnionalinii.Contains("Ź") == true
+                                                    ||
+                                                    plikstringstxt_trescuaktualnionalinii.Contains("Ć") == true
+                                                    ||
+                                                    plikstringstxt_trescuaktualnionalinii.Contains("Ń") == true
+                                               )
+                                           )
+                                        {
+
+                                            plikstringstxt_trescuaktualnionalinii = "<size=" + wielkiznakPL_rozmiar + "%>" + plikstringstxt_trescuaktualnionalinii + "</size>";
+
+                                        }
+                                        else
+                                        {
+                                            if (wielkiznakPL_rozmiar != 100)
+                                            {
+                                                plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
+                                                    .Replace("Ś", "<size=" + wielkiznakPL_rozmiar + "%>Ś</size>")
+                                                    .Replace("Ż", "<size=" + wielkiznakPL_rozmiar + "%>Ż</size>")
+                                                    .Replace("Ź", "<size=" + wielkiznakPL_rozmiar + "%>Ź</size>")
+                                                    .Replace("Ć", "<size=" + wielkiznakPL_rozmiar + "%>Ć</size>")
+                                                    .Replace("Ń", "<size=" + wielkiznakPL_rozmiar + "%>Ń</size>");
+
+                                            }
+                                        }
+
 
                                         plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
 
@@ -1683,16 +1717,6 @@ namespace PWRlangConverter
                                         .Replace("<bs_n1>", "\\\"")
                                         .Replace("<bs_br>", "<br>");
 
-                                        if (wielkiznakPL_rozmiar != 100)
-                                        {
-                                            plikstringstxt_trescuaktualnionalinii = plikstringstxt_trescuaktualnionalinii
-                                                .Replace("Ś", "<size=" + wielkiznakPL_rozmiar + "%>Ś</size>")
-                                                .Replace("Ż", "<size=" + wielkiznakPL_rozmiar + "%>Ż</size>")
-                                                .Replace("Ź", "<size=" + wielkiznakPL_rozmiar + "%>Ź</size>")
-                                                .Replace("Ć", "<size=" + wielkiznakPL_rozmiar + "%>Ć</size>")
-                                                .Replace("Ń", "<size=" + wielkiznakPL_rozmiar + "%>Ń</size>");
-
-                                        }
 
 
                                         if (plikkeystxt_wartoscilinii.Length > 1)
