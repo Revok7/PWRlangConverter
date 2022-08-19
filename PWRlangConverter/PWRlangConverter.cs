@@ -505,7 +505,7 @@ namespace PWRlangConverter
 
                 string numer_operacji_string;
 
-                Console.WriteLine("PWRlangConverter v.1.82-BETA by Revok (2022)");
+                Console.WriteLine("PWRlangConverter v.1.81 by Revok (2022)");
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("[PWR_PL]-------------------------------");
@@ -515,8 +515,7 @@ namespace PWRlangConverter
                 Console.WriteLine("3. [JSON->JSON] Konwersja pliku JSON z polskimi znakami na plik bez polskich znakow.");
                 Console.WriteLine("100. [JSON+Metadane->JSON] Wdrażanie aktualizacji do pliku JSON.");
                 Console.WriteLine("101. [JSON+Metadane->Folder JSON] Tworzenie struktury lokalizacji dla Enhanced Edition.");
-                Console.WriteLine("[ToyBox_PL]-----------------------------");
-                Console.WriteLine("200. [2xTransifex.com.TXT(EN&PL)+BagOfTricks.CS->Folder JSON] Konwersja plików TXT z platformy Transifex.com do pliku kodu źródłowego CS ToyBoxa.");
+                Console.WriteLine("---------------------------------------");
                 Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
                 numer_operacji_string = Console.ReadLine();
 
@@ -551,7 +550,7 @@ namespace PWRlangConverter
                         TworzenieStrukturyPlikowLokalizacji_WeryfikacjaPlikowUpdateLocStruct();
                     }
                     else
-                            {
+                    {
                         Console.BackgroundColor = ConsoleColor.Red;
                         Console.WriteLine("Podano błędny numer operacji.");
                         Console.ResetColor();
@@ -3714,114 +3713,6 @@ namespace PWRlangConverter
 
         }
 
-
-
-
-        //ToyBox_PL
-        public static void ToyBoxPL_ENplusPL_2xTXTTransifexCOMtoCS_ZNumeramiLiniiZPlikuCS()
-        {
-            string plikCS_oryginalnyEN_nazwa;
-            string plikstringTransifexcomTXTEN_nazwa;
-            string plikstringTransifexcomTXTPL_nazwa;
-
-            Console.Write("Podaj nazwę oryginalnego pliku BagOfTricks.cs: ");
-            plikCS_oryginalnyEN_nazwa = Console.ReadLine();
-            Console.Write("Podaj nazwę pliku TXT pochodzącego z Transifex w języku EN: ");
-            plikstringTransifexcomTXTEN_nazwa = Console.ReadLine();
-            Console.Write("Podaj nazwę pliku TXT pochodzącego z Transifex w języku PL: ");
-            plikstringTransifexcomTXTPL_nazwa = Console.ReadLine();
-
-
-            if
-            (
-                File.Exists(plikCS_oryginalnyEN_nazwa) == true &&
-                File.Exists(plikstringTransifexcomTXTEN_nazwa) == true &&
-                File.Exists(plikstringTransifexcomTXTPL_nazwa) == true
-            )
-            {
-
-
-                List<string> plikCS_oryginalnyEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy(plikCS_oryginalnyEN_nazwa);
-                List<string> plikstringTransifexcomTXTEN_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy(plikstringTransifexcomTXTEN_nazwa);
-                List<string> plikstringTransifexcomTXTPL_zawartosclinii = ToyBoxPL_WczytajDaneZPlikuDoListy(plikstringTransifexcomTXTPL_nazwa);
-
-
-                if (plikstringTransifexcomTXTEN_zawartosclinii.Count() == plikstringTransifexcomTXTPL_zawartosclinii.Count())
-                {
-
-                    for (int op1 = 0; op1 < plikCS_oryginalnyEN_zawartosclinii.Count(); op1++)
-                    {
-                        string aktualnalinia_zawartosc = plikCS_oryginalnyEN_zawartosclinii[op1];
-
-                        if (aktualnalinia_zawartosc.Contains('"') == true)
-                        {
-                            string[] podzial1 = aktualnalinia_zawartosc.Split('"');
-
-                            //TUTAJ SKOŃCZYŁEM 2022.08.18 g.23.17
-                        }
-                    }
-                    
-
-                }
-                else
-                {
-                    Blad("BŁĄD: Ilość linii w plikach \"" + plikstringTransifexcomTXTEN_nazwa + "\" i \"\" + plikstringTransifexcomTXTPL_nazwa + \"\" nie zgadza się.");
-                }
-
-            }
-            else
-            {
-                Blad("BŁĄD: Nie istnieje przynajmniej jeden z podanych plików.");
-            }
-
-
-
-            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
-            Console.ReadKey();
-
-        }
-
-        public static List<string> ToyBoxPL_WczytajDaneZPlikuDoListy(string sciezka_do_pliku)
-        {
-            List<string> plik_zawartosclinii = new List<string>();
-
-            if (File.Exists(sciezka_do_pliku) == true)
-            {
-
-                FileStream plik_fs = new FileStream(sciezka_do_pliku, FileMode.Open, FileAccess.Read);
-
-                try
-                {
-                    StreamReader plik_sr = new StreamReader(plik_fs);
-
-                    int plik_numerlinii = 1;
-                    while (plik_sr.Peek() != -1)
-                    {
-                        string zawartosc_linii = plik_sr.ReadLine();
-                        plik_zawartosclinii.Add(zawartosc_linii);
-
-                        plik_numerlinii++;
-                    }
-
-                    plik_sr.Close();
-
-                }
-                catch
-                {
-                    Blad("BŁĄD: Wystapił nieoczekiwany błąd w dostępie do pliku we wskazanej ścieżce: \"" + sciezka_do_pliku + "\".");
-                }
-
-                plik_fs.Close();
-            
-            }
-            else
-            {
-                Blad("BŁĄD: Nie istnieje taki plik we wskazanej ścieżce: \"" + sciezka_do_pliku + "\"");
-            }
-
-            return plik_zawartosclinii;
-
-        }
 
     }
 }
