@@ -508,7 +508,7 @@ namespace PWRlangConverter
                 Console.WriteLine("PWRlangConverter v.1.81 by Revok (2022)");
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
-                Console.WriteLine("[PWR_PL]-------------------------------");
+                Console.WriteLine("---[PWR_PL]:");
                 Console.WriteLine("0. Uruchomienie makra lub jego zdefiniowanie.");
                 Console.WriteLine("1. [1xstringsTransifexCOM] Weryfikacja identyfikatorów numerów linii na początku stringów w pliku TXT pochodzącego z Transifex.com.");
                 Console.WriteLine("2. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON.");
