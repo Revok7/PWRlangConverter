@@ -1,11 +1,11 @@
 {
 	"autoWprowadzanieNazwPlikowWejsciowych": "0",
-	"zdefiniowaneMakro": "1;1;101;1;101;2",
+	"zdefiniowaneMakro": "",
 	"narzucRozmiarWProcentachDlaWielkichZnakowPL": "90",
 	"domyslnaNazwaPlikuTXTZTransifexCOM": "for_use_PWR_PL_engb-101c-origjsonstringstransifexcomtxt_pl.txt",
 	"domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM": "for_use_%NUMER_PORZADKOWY_AKTUALIZACJI%-pwr_pl-korekta-aktualizacji-%OZNACZENIE_AKTUALIZACJI%_engb-update-%OZNACZENIE_AKTUALIZACJI%jsonstringstransifexcomtxt_pl.txt",
 	"domyslnaNazwaPlikukeysTransifexCOMTXT": "plPL-1.0.1c.json.keysTransifexCOM.txt",
 	"domyslnaNazwaPlikustringsTransifexCOMTXT": "for_use_PWR_PL_engb-101c-origjsonstringstransifexcomtxt_pl.txt",
 	"domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT": "plPL-update-%OZNACZENIE_AKTUALIZACJI%.json.keysTransifexCOM.txt",
-	"domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON": "NOWY_plPL-9.0.0.json"
+	"domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON": "NOWY_plPL-x.x.x.json"
 }
