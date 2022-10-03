@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd &quot;C:\Users\revok\Documents\Visual Studio 2022\Revok-projekty\C#\PWRlangConverter\&quot;&#xD;&#xA;start Zdarzenia_po_kompilacji.cmd" />
+    <Exec Command="start ../Zdarzenia_po_kompilacji.cmd" />
   </Target>
 
 </Project>
