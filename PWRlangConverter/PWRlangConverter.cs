@@ -84,7 +84,8 @@ namespace PWRlangConverter
 
 
     class PWRlangConverter
-    {        
+    {
+        readonly static string _PWR_naglowek = "PWRlangConverter v.1.82 by Revok (2022)";
 
         readonly static bool wl_pasekpostepu = false; //!!!wlaczenie tej opcji znacznie wydłuża wykonywanie operacji!!!
         const string skrypt = "PWRlangConverter.cs";
@@ -493,6 +494,7 @@ namespace PWRlangConverter
 
         static void Main(string[] args)
         {
+            Console.Title =_PWR_naglowek;
             
             Process[] procesy_nazwa = Process.GetProcessesByName("PWRlangConverter");
 
@@ -512,7 +514,7 @@ namespace PWRlangConverter
 
                 string numer_operacji_string;
 
-                Console.WriteLine("PWRlangConverter v.1.82 by Revok (2022)");
+                Console.WriteLine(_PWR_naglowek);
 
                 Console.WriteLine("WAŻNE: Pliki poddawane operacjom muszą zostać skopiowane wcześniej do folderu z tym programem.");
                 Console.WriteLine("---[PWR_PL]:");
