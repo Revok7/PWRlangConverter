@@ -52,7 +52,7 @@ namespace PWRlangConverter
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikukeysTransifexCOMTXT\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikustringsTransifexCOMTXT\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuAktualizacjikeysTransifexCOMTXT\": \"plPL-update-%OZNACZENIE_AKTUALIZACJI%.json.keysTransifexCOM.txt\",");
-                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON\": \"NOWY_plPL-9.0.0.json\"");
+                plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaWygenerowanegoPlikuLokalizacjiJSON\": \"deDE.json\",");
 
 
 
