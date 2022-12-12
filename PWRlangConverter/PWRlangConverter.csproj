@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="start ../Zdarzenia_po_kompilacji.cmd" />
+    <Exec Command="cd ..&#xD;&#xA;start Zdarzenia_po_kompilacji.cmd&#xD;&#xA;" />
   </Target>
 
 </Project>

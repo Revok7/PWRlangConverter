@@ -20,6 +20,8 @@ using System.ComponentModel;
 
 using Goblinfactory.ProgressBar.moddedbyRevok;
 
+
+
 namespace PWRlangConverter
 {
     public class Rekord : IEquatable<Rekord>, IComparable<Rekord>
@@ -85,7 +87,7 @@ namespace PWRlangConverter
 
     class PWRlangConverter
     {
-        readonly static string _PWR_naglowek = "PWRlangConverter v.1.82 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangConverter v.1.83 by Revok (2022)";
 
         readonly static bool wl_pasekpostepu = false; //!!!wlaczenie tej opcji znacznie wydłuża wykonywanie operacji!!!
         const string skrypt = "PWRlangConverter.cs";
@@ -447,23 +449,23 @@ namespace PWRlangConverter
                 else if (numer_operacji2_int == 2)
                 {
                     Console.WriteLine("Prawidłowo zdefiniowane makro umożliwia wykonanie wszystkich wymaganych operacji w zautomatyzowany sposób." +
-                              "Aby zdefiniować makro lub zmodyfikować już istniejące, należy:\n" +
-                              "1. Edytować plik \"cfg.json\" w edytorze tekstowym.\n" +
-                              "2. Odnaleźć linię zawierającą wpis: '\"autoWprowadzanieNazwPlikowWejsciowych\": \"1\",' a jeśli wartość jest ustawiona na 0 to zmienić ją na 1.\n" +
-                              "3. Odnaleźć linię zawierającą wpis: '\"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",';\n" +
-                              "4. Zamiast tekstu <TUTAJ_ZDEFINIUJ_MAKRO> wpisać makro, które chcemy zdefiniować (przykład poniżej).\n" +
-                              "5. Zapisać plik i uruchomić ponownie PWRlangConverter.\n" +
-                              "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je średnikami ','.\n" +
-                              "Na przykład zdefiniowanie makra: \"1;1; 1;2; 2;1;0;0; 2;2;1;0; 100;1\" spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
-                              "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym dla wersji gry 1.0.1c\n" +
-                              "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym aktualizacji dla wersji gry x.x.x\n" +
-                              "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: 1.0.1c (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
-                              "-Konwersja pliku aktualizacji lokalizacji TXT->JSON dla wersji gry: x.x.x (z dołączeniem numerów porządkowych, ale bez dołączenia numerów/id linii)\n" +
-                              "-Wdrażanie aktualizacji do pliku lokalizacji 1.0.1c->x.x.x\n" +
-                              "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2, 100 o 101 tj. weryfikacji, konwersji TXT->JSON, wdrażania aktualizacji i tworzenia struktury lokalizacji.\n" +
-                              "UWAGA2: Pierwsza operacja makra musi zostać zdefiniowana jako: 1 (tj. weryfikacja).\n" +
-                              "UWAGA3: Zaleca się definiowanie makra w taki sposób aby w pierwszej kolejności wykonywać operacje weryfikacji (1) dla wszystkich plików po kolei, następnie konwersję (2) dla wszystkich plików, a na końcu wdrażanie aktualizacji (100) po kolei dla wszystkich plików.\n" +
-                              "UWAGA4: Można dodawać spacje w zdefiniowanym makrze. Jeśli makro jest długie, poprawi to czytelność i ułatwi jego edycję w przyszłości.");
+                                      "Aby zdefiniować makro lub zmodyfikować już istniejące, należy:\n" +
+                                      "1. Edytować plik \"cfg.json\" w edytorze tekstowym.\n" +
+                                      "2. Odnaleźć linię zawierającą wpis: '\"autoWprowadzanieNazwPlikowWejsciowych\": \"1\",' a jeśli wartość jest ustawiona na 0 to zmienić ją na 1.\n" +
+                                      "3. Odnaleźć linię zawierającą wpis: '\"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",';\n" +
+                                      "4. Zamiast tekstu <TUTAJ_ZDEFINIUJ_MAKRO> wpisać makro, które chcemy zdefiniować (przykład poniżej).\n" +
+                                      "5. Zapisać plik i uruchomić ponownie PWRlangConverter.\n" +
+                                      "Zamiast <TUTAJ_ZDEFINIUJ_MAKRO> wpisz numery operacji, które mają zostać automatycznie wybrane, oddzielając je średnikami ','.\n" +
+                                      "Na przykład zdefiniowanie makra: \"1;1; 1;2; 2;1;0;0; 2;2;1;0; 100;1\" spowoduje po kolei wykonywanie przez narzędzie operacji:\n" +
+                                      "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym dla wersji gry " + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + "\n" +
+                                      "-Weryfikacja identyfikatorów numerów linii w pliku lokalizacyjnym aktualizacji dla wersji gry x.x.x\n" +
+                                      "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: " + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + " (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
+                                      "-Konwersja pliku aktualizacji lokalizacji TXT->JSON dla wersji gry: x.x.x (z dołączeniem numerów porządkowych, ale bez dołączenia numerów/id linii)\n" +
+                                      "-Wdrażanie aktualizacji do pliku lokalizacji " + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + "->x.x.x\n" +
+                                      "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2, 100 o 101 tj. weryfikacji, konwersji TXT->JSON, wdrażania aktualizacji i tworzenia struktury lokalizacji.\n" +
+                                      "UWAGA2: Pierwsza operacja makra musi zostać zdefiniowana jako: 1 (tj. weryfikacja).\n" +
+                                      "UWAGA3: Zaleca się definiowanie makra w taki sposób aby w pierwszej kolejności wykonywać operacje weryfikacji (1) dla wszystkich plików po kolei, następnie konwersję (2) dla wszystkich plików, a na końcu wdrażanie aktualizacji (100) po kolei dla wszystkich plików.\n" +
+                                      "UWAGA4: Można dodawać spacje w zdefiniowanym makrze. Jeśli makro jest długie, poprawi to czytelność i ułatwi jego edycję w przyszłości.");
 
                     Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
                     Console.ReadKey();
@@ -745,7 +747,7 @@ namespace PWRlangConverter
 
         public static void WeryfikacjaPlikowMetadanych(string nazwa_metody_ktora_ma_zostac_uruchomiona)
         {
-            Console.WriteLine("1. #01_1.0.1c");
+            Console.WriteLine("1. #" + cfg.numerPorzadkowyPierwszegoProjektuZTransifexCOM + "_" + cfg.wersjaGryPierwszegoProjektuZTransifexCOM);
 
             string folderupdate = folderglownyprogramu + "//" + "update";
             string przyrostek_UpdateLocStruct = ".UpdateLocStruct.json";

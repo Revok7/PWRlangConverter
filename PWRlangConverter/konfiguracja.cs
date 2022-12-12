@@ -22,6 +22,8 @@ namespace PWRlangConverter
         public string autoWprowadzanieNazwPlikowWejsciowych { get; set; }
         public string zdefiniowaneMakro { get; set; }
         public string narzucRozmiarWProcentachDlaWielkichZnakowPL { get; set; }
+        public string numerPorzadkowyPierwszegoProjektuZTransifexCOM { get; set; }
+        public string wersjaGryPierwszegoProjektuZTransifexCOM { get; set; }
         public string domyslnaNazwaPlikuTXTZTransifexCOM { get; set; }
         public string domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM { get; set; }
         public string domyslnaNazwaPlikukeysTransifexCOMTXT { get; set; }
@@ -46,7 +48,9 @@ namespace PWRlangConverter
 
                 plikCFGdomyslny_sw.WriteLine("      \"autoWprowadzanieNazwPlikowWejsciowych\": \"0\",");
                 plikCFGdomyslny_sw.WriteLine("      \"zdefiniowaneMakro\": \"<TUTAJ_ZDEFINIUJ_MAKRO>\",");
-                plikCFGdomyslny_sw.WriteLine("      \"narzucRozmiarWProcentachDlaWielkichZnakowPL\": \"90\",");
+                plikCFGdomyslny_sw.WriteLine("      \"narzucRozmiarWProcentachDlaWielkichZnakowPL\": \"100\",");
+                plikCFGdomyslny_sw.WriteLine("      \"numerPorzadkowyPierwszegoProjektuZTransifexCOM\": \"01\",");
+                plikCFGdomyslny_sw.WriteLine("      \"wersjaGryPierwszegoProjektuZTransifexCOM\": \"1.0.1c\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTZTransifexCOM\": \"\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikuTXTAktualizacjiZTransifexCOM\": \"for_use_%NUMER_PORZADKOWY_AKTUALIZACJI%-pwr_pl-korekta-aktualizacji-%OZNACZENIE_AKTUALIZACJI%_engb-update-%OZNACZENIE_AKTUALIZACJI%jsonstringstransifexcomtxt_pl.txt\",");
                 plikCFGdomyslny_sw.WriteLine("      \"domyslnaNazwaPlikukeysTransifexCOMTXT\": \"\",");
