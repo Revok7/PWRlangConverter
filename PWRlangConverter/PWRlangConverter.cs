@@ -19,8 +19,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 
 using Goblinfactory.ProgressBar.moddedbyRevok;
-
-
+using System.ComponentModel.Design.Serialization;
 
 namespace PWRlangConverter
 {
@@ -87,7 +86,7 @@ namespace PWRlangConverter
 
     class PWRlangConverter
     {
-        readonly static string _PWR_naglowek = "PWRlangConverter v.1.83 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangConverter v.2.00 by Revok (2022)";
 
         readonly static bool wl_pasekpostepu = false; //!!!wlaczenie tej opcji znacznie wydłuża wykonywanie operacji!!!
         const string skrypt = "PWRlangConverter.cs";
@@ -104,6 +103,7 @@ namespace PWRlangConverter
         static bool makro_pomyslnezakonczenieoperacjinr2 = false;
         static bool makro_pomyslnezakonczenieoperacjinr100 = false;
         static bool makro_pomyslnezakonczenieoperacjinr101 = false;
+        static bool makro_pomyslnezakonczenieoperacjinr200 = false;
         static List<string> makro_bledy_lista = new List<string>(); //element listy: "makro_numeroperacjiwkolejnosci;komunikat_obledzie"
         static List<string> makro_sukcesy_lista = new List<string>(); //element listy: "makro_numeroperacjiwkolejnosci;komunikat_osukcesie"
 
@@ -320,6 +320,7 @@ namespace PWRlangConverter
                 makro_pomyslnezakonczenieoperacjinr2 = false;
                 makro_pomyslnezakonczenieoperacjinr100 = false;
                 makro_pomyslnezakonczenieoperacjinr101 = false;
+                makro_pomyslnezakonczenieoperacjinr200 = false;
 
                 int makro_sprawdzeniekolejnejoperacji = makro_aktualny_indeks_listy + 1;
 
@@ -342,6 +343,10 @@ namespace PWRlangConverter
                         WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych();
                     }
                     else if (makro_operacjadowykonania == 101)
+                    {
+                        WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych(true);
+                    }
+                    else if (makro_operacjadowykonania == 200)
                     {
                         TworzenieStrukturyPlikowLokalizacji_WeryfikacjaPlikowUpdateLocStruct();
                     }
@@ -462,9 +467,9 @@ namespace PWRlangConverter
                                       "-Konwersja pliku lokalizacji TXT->JSON dla wersji gry: " + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + " (bez dołączenia numerów porządkowych i bez dołączenia numerów/id linii)\n" +
                                       "-Konwersja pliku aktualizacji lokalizacji TXT->JSON dla wersji gry: x.x.x (z dołączeniem numerów porządkowych, ale bez dołączenia numerów/id linii)\n" +
                                       "-Wdrażanie aktualizacji do pliku lokalizacji " + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + "->x.x.x\n" +
-                                      "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2, 100 o 101 tj. weryfikacji, konwersji TXT->JSON, wdrażania aktualizacji i tworzenia struktury lokalizacji.\n" +
+                                      "UWAGA: Makra działają wyłącznie dla operacji narzędzia: 1, 2, 100, 101 i 200 tj. weryfikacji, konwersji TXT->JSON, wdrażania aktualizacji, zbiorczego wdrażania aktualizacji i tworzenia struktury lokalizacji.\n" +
                                       "UWAGA2: Pierwsza operacja makra musi zostać zdefiniowana jako: 1 (tj. weryfikacja).\n" +
-                                      "UWAGA3: Zaleca się definiowanie makra w taki sposób aby w pierwszej kolejności wykonywać operacje weryfikacji (1) dla wszystkich plików po kolei, następnie konwersję (2) dla wszystkich plików, a na końcu wdrażanie aktualizacji (100) po kolei dla wszystkich plików.\n" +
+                                      "UWAGA3: Zaleca się definiowanie makra w taki sposób aby w pierwszej kolejności wykonywać operacje weryfikacji (1) dla wszystkich plików po kolei, następnie konwersję (2) dla wszystkich plików, a na końcu wdrażanie aktualizacji (100) po kolei dla wszystkich plików lub na końcu zbiorcze wdrażanie aktualizacji (101).\n" +
                                       "UWAGA4: Można dodawać spacje w zdefiniowanym makrze. Jeśli makro jest długie, poprawi to czytelność i ułatwi jego edycję w przyszłości.");
 
                     Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
@@ -525,7 +530,8 @@ namespace PWRlangConverter
                 Console.WriteLine("2. [2xTransifex.com.TXT->1xJSON] Konwersja plików TXT z platformy Transifex.com do pliku JSON.");
                 Console.WriteLine("3. [JSON->JSON] Konwersja pliku JSON z polskimi znakami na plik bez polskich znakow.");
                 Console.WriteLine("100. [JSON+Metadane->JSON] Wdrażanie aktualizacji do pliku JSON.");
-                Console.WriteLine("101. [JSON+Metadane->Folder JSON] Tworzenie struktury lokalizacji dla Enhanced Edition.");
+                Console.WriteLine("101. [JSON+Metadane->JSON] Zbiorcze wdrażanie aktualizacji do pliku JSON.");
+                Console.WriteLine("200. [JSON+Metadane->Folder JSON] Tworzenie struktury lokalizacji dla Enhanced Edition.");
                 Console.WriteLine("---------------------------------------");
                 Console.Write("Wpisz numer operacji, którą chcesz wykonać: ");
                 numer_operacji_string = Console.ReadLine();
@@ -558,13 +564,16 @@ namespace PWRlangConverter
                     }
                     else if (numer_operacji_int == 101)
                     {
+                        WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych(true);
+                    }
+                    else if (numer_operacji_int == 200)
+                    {
                         TworzenieStrukturyPlikowLokalizacji_WeryfikacjaPlikowUpdateLocStruct();
                     }
+
                     else
                     {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Podano błędny numer operacji.");
-                        Console.ResetColor();
+                        Blad("Podano błędny numer operacji.");
 
                         Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
                         Console.ReadKey();
@@ -572,9 +581,7 @@ namespace PWRlangConverter
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Podano błedny numer operacji.");
-                    Console.ResetColor();
+                    Blad("Podano błedny numer operacji.");
 
                     Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
                     Console.ReadKey();
@@ -583,9 +590,7 @@ namespace PWRlangConverter
             }
             else
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("Aplikacja PWRlangConverter jest aktualnie uruchomiona w innym oknie lub nazwa pliku wykonywalnego jest nieprawidłowa.");
-                Console.ResetColor();
+                Blad("Aplikacja PWRlangConverter jest aktualnie uruchomiona w innym oknie lub nazwa pliku wykonywalnego jest nieprawidłowa.");
 
                 Console.WriteLine("Kliknij ENTER aby zamknąć to okno.");
                 Console.ReadKey();
@@ -2207,7 +2212,7 @@ namespace PWRlangConverter
 
         }
 
-        public static void WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych()
+        public static void WdrazanieAktualizacji_WeryfikacjaPlikowMetadanych(bool zbiorcze_wdrazanie_aktualizacji = false)
         {
             string folderupdate = folderglownyprogramu + "//" + "update";
             string przyrostek_UpdateLocStruct = ".UpdateLocStruct.json";
@@ -2237,7 +2242,10 @@ namespace PWRlangConverter
                         {
                             lista_oznaczen_aktualizacji.Add(oznaczenie_aktualizacji);
 
-                            Console.WriteLine(np + ". " + oznaczenie_aktualizacji.Replace("-", "->"));
+                            if (zbiorcze_wdrazanie_aktualizacji == false)
+                            {
+                                Console.WriteLine(np + ". " + oznaczenie_aktualizacji.Replace("-", "->"));
+                            }
 
                             np++;
                         }
@@ -2248,20 +2256,27 @@ namespace PWRlangConverter
 
                 if (istniejacenazwyplikowmetadanych.Count > 0 && lista_oznaczen_aktualizacji.Count > 0)
                 {
-                    string numer_pozycji_string;
-                    Console.Write("Wpisz numer pozycji aktualizacji, którą chcesz wdrożyć: ");
+                    string numer_pozycji_string = "";
 
-                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    if (zbiorcze_wdrazanie_aktualizacji == false)
                     {
-                        makro_aktualny_indeks_listy = makro_aktualny_indeks_listy + 1;
-                        numer_pozycji_string = makro_operacje_lista[makro_aktualny_indeks_listy];
-                        Console.WriteLine(makro_operacje_lista[makro_aktualny_indeks_listy]);
-                    }
-                    else
-                    {
-                        numer_pozycji_string = Console.ReadLine();
-                    }
+                        Console.Write("Wpisz numer pozycji aktualizacji, którą chcesz wdrożyć: ");
 
+                        if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                        {
+                            makro_aktualny_indeks_listy = makro_aktualny_indeks_listy + 1;
+                            numer_pozycji_string = makro_operacje_lista[makro_aktualny_indeks_listy];
+                            Console.WriteLine(makro_operacje_lista[makro_aktualny_indeks_listy]);
+                        }
+                        else
+                        {
+                            numer_pozycji_string = Console.ReadLine();
+                        }
+                    }
+                    else if (zbiorcze_wdrazanie_aktualizacji == true)
+                    {
+                        numer_pozycji_string = lista_oznaczen_aktualizacji.Count().ToString();
+                    }
 
 
                     if (CzyParsowanieINTUdane(numer_pozycji_string))
@@ -2278,8 +2293,16 @@ namespace PWRlangConverter
                                 string numerporzadkowy_aktualizacji = tmp2_loa[0];
                                 string oznaczenie_aktualizacji = tmp2_loa[1];
 
-                                WdrazanieAktualizacji_Wielowatkowe(numerporzadkowy_aktualizacji, oznaczenie_aktualizacji);
+                                if (zbiorcze_wdrazanie_aktualizacji == false)
+                                {
+                                    WdrazanieAktualizacji_Wielowatkowe(numerporzadkowy_aktualizacji, oznaczenie_aktualizacji);
+                                }
+                                else if (zbiorcze_wdrazanie_aktualizacji == true)
+                                {
+                                    //Console.WriteLine("[DEBUG] numer_pozycji_string == " + numer_pozycji_string);
 
+                                    ZbiorczeWdrazanieAktualizacji(lista_oznaczen_aktualizacji, numerporzadkowy_aktualizacji, oznaczenie_aktualizacji);
+                                }
                             }
                             else
                             {
@@ -2974,7 +2997,241 @@ namespace PWRlangConverter
 
         }
 
+        public static void ZbiorczeWdrazanieAktualizacji(List<string> lista_oznaczen_aktualizacji, string numerporzadkowy_aktualizacji_docelowej, string oznaczenie_aktualizacji_docelowej)
+        {
+            string numerwersjidocelowej = oznaczenie_aktualizacji_docelowej.Split(new char[] { '-' })[1];
 
+            //Console.WriteLine("[DEBUG] Zbiorcze wdrażanie aktualizacji: " + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + "----->" + numerwersjidocelowej);
+
+            List<Rekord> lista_rekordowplikudocelowego = new List<Rekord>();
+            int tmp_plikdocelowy_aktualnyindeks = 0;
+
+            string folderupdate = folderglownyprogramu + "//" + "update";
+            string plikUpdateSchemaJSONwersjidocelowej_nazwa = numerporzadkowy_aktualizacji_docelowej + "_" + oznaczenie_aktualizacji_docelowej + ".UpdateSchema.json";
+
+            List<string> lista_wymaganychplikow = new List<string>();
+            List<string> lista_brakujacychplikow = new List<string>();
+
+            if (File.Exists("NOWY_plPL-" + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + ".json") == true)
+            {
+                lista_wymaganychplikow.Add("NOWY_plPL-" + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + ".json");
+            }
+            else
+            {
+                lista_brakujacychplikow.Add("NOWY_plPL-" + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + ".json");
+            }
+
+            for (int i1 = 0; i1 < lista_oznaczen_aktualizacji.Count(); i1++)
+            {
+                string nazwa_wymaganego_pliku = "NOWY_plPL-update-" + lista_oznaczen_aktualizacji[i1].Split(new char[] { '_' })[1] + ".json";
+                
+                if (File.Exists(nazwa_wymaganego_pliku) == true)
+                {
+                    lista_wymaganychplikow.Add(nazwa_wymaganego_pliku);
+                }
+                else
+                {
+                    lista_brakujacychplikow.Add(nazwa_wymaganego_pliku);
+                }
+            }
+
+
+            if ((lista_wymaganychplikow.Count() == lista_oznaczen_aktualizacji.Count() + 1) && lista_brakujacychplikow.Count() == 0)
+            {
+                List<List<Rekord>> listaplikow_listarekordow = new List<List<Rekord>>(); //listaplikow_listarekordow[indeks_pliku][indeks_rekordu]
+
+                for (int i2 = 0; i2 < lista_wymaganychplikow.Count; i2++)
+                {
+
+                    List<Rekord> danezplikuJSON_listarekordow = new List<Rekord>();
+
+                    dynamic[] danezplikuJSON_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(lista_wymaganychplikow[i2]);
+
+                    List<dynamic> danezplikuJSON_listakluczy = danezplikuJSON_tablicalistdanych[0];
+                    List<List<dynamic>> danezplikuJSON_listastringow = danezplikuJSON_tablicalistdanych[1];
+
+                    for (int i2b = 0; i2b < danezplikuJSON_listakluczy.Count; i2b++)
+                    {
+
+                        if (i2b != 0 && i2b != 1) //odfiltrowanie pierwszych dwóch rekordów zawierających słowa, wczytane z pliku JSON, takie jak: "$id", "string", "1"
+                        {
+                            for (int i2c = 0; i2c < danezplikuJSON_listastringow[i2b].Count(); i2c++)
+                            {
+
+                                int _ID = i2b - 2;
+                                string _Plik = lista_wymaganychplikow[i2].ToString();
+                                string _Klucz = danezplikuJSON_listakluczy[i2b];
+                                string _String = FiltrujString(danezplikuJSON_listastringow[i2b][i2c]);
+
+                                //Console.WriteLine("[DEBUG] " + _ID + "|" + _Plik + "|" + _Klucz + "|" + _String);
+
+                                danezplikuJSON_listarekordow.Add(new Rekord { ID = _ID, Plik = _Plik, Klucz = _Klucz, String = _String });
+
+                            }
+
+                        }
+
+
+                    }
+
+                    listaplikow_listarekordow.Add(danezplikuJSON_listarekordow);
+
+                }
+
+                /*
+                Console.WriteLine("[DEBUG] listaplikow_listarekordow.Count()==" + listaplikow_listarekordow.Count());
+                for (int dbg1 = 0; dbg1 < listaplikow_listarekordow.Count(); dbg1++)
+                {
+                    Console.WriteLine("[DEBUG] listaplikow_listarekordow[" + dbg1 + "].Count()==" + listaplikow_listarekordow[dbg1].Count());
+                }
+                Console.WriteLine("[DEBUG] listaplikow_listarekordow[0][0] zawiera:\n" + listaplikow_listarekordow[0][0]);
+                */
+
+
+                dynamic[] _SchematLokalizacjiWersjiDocelowej = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateSchemaJSONwersjidocelowej_nazwa);
+                List<dynamic> _SchematLokalizacjiWersjiDocelowej_listakluczy = _SchematLokalizacjiWersjiDocelowej[0];
+
+                double nr_ostatniej_linii = _SchematLokalizacjiWersjiDocelowej_listakluczy.Count();
+
+                for (int i3 = 0; i3 < _SchematLokalizacjiWersjiDocelowej_listakluczy.Count(); i3++)
+                {
+                    double numeraktualnejlinii = i3 + 1;
+
+                    for (int i3b = listaplikow_listarekordow.Count() - 1; i3b >= 0; i3b--)
+                    {
+                        //Console.WriteLine("[DEBUG] Szukam klucza: " + _SchematLokalizacjiWersjiDocelowej_listakluczy[i3]);
+
+                        List<Rekord> lista_znalezionekluczewdanympliku = listaplikow_listarekordow[i3b].FindAll(x => x.Klucz == _SchematLokalizacjiWersjiDocelowej_listakluczy[i3]);
+                        
+                        if (lista_znalezionekluczewdanympliku.Count() == 1)
+                        {
+                            lista_rekordowplikudocelowego.Add(new Rekord
+                            {
+                                ID = tmp_plikdocelowy_aktualnyindeks,
+                                Plik = lista_znalezionekluczewdanympliku[0].Plik,
+                                Klucz = lista_znalezionekluczewdanympliku[0].Klucz,
+                                String = lista_znalezionekluczewdanympliku[0].String
+                            });
+
+                            tmp_plikdocelowy_aktualnyindeks++;
+
+                            //Console.WriteLine("[DEBUG] Znaleziono klucz: " + _SchematLokalizacjiWersjiDocelowej_listakluczy[i3] + " w i3b==" + i3b);
+
+                            string komunikat_aktualnypostep = "Trwa zbiorcze wdrażanie aktualizacji " + cfg.wersjaGryPierwszegoProjektuZTransifexCOM + "----->" + numerwersjidocelowej + " do linii nr.: " + numeraktualnejlinii + "/" + nr_ostatniej_linii + " [" + PoliczPostepWProcentach(numeraktualnejlinii, nr_ostatniej_linii) + "%]";
+
+                            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                            {
+                                int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+                                komunikat_aktualnypostep = "[Operacja makra: " + makro_numeroperacjiwkolejnosci + "/" + makro_operacje_lista.Count + "] " + komunikat_aktualnypostep;
+                            }
+
+                            Console.WriteLine(komunikat_aktualnypostep);
+
+                            break;
+                        }
+                        else if (lista_znalezionekluczewdanympliku.Count() == 0)
+                        {
+                            //kontynuowanie wyszukiwania klucza w innych plikach metodą wstecznej symulacji (zezwolenie na dalsze działanie pętli)
+                        }
+                        else
+                        {
+                            Blad("Krytyczny błąd: W pliku o przydzielonym indeksie wewnętrznym i3b=" + i3b + " występuje więcej niż 1 linia zawierająca ten sam klucz o wartości: \"\".");
+                        }
+                        
+
+                    }
+
+                }
+
+
+                //Console.WriteLine("[DEBUG] lista_rekordowplikudocelowego.Count()==" + lista_rekordowplikudocelowego.Count());
+
+
+                string nazwafinalnegoplikuJSON = "NOWY_plPL-" + numerwersjidocelowej + ".json";
+
+                if (File.Exists(nazwafinalnegoplikuJSON) == true) { File.Delete(nazwafinalnegoplikuJSON); }
+
+
+                UtworzNaglowekJSON(nazwafinalnegoplikuJSON);
+
+
+                FileStream finalnyplikJSON_fs = new FileStream(nazwafinalnegoplikuJSON, FileMode.Append, FileAccess.Write);
+
+                try //#1
+                {
+                    StreamWriter finalnyplikJSON_sw = new StreamWriter(finalnyplikJSON_fs);
+
+                    for (int zzd1 = 0; zzd1 < lista_rekordowplikudocelowego.Count; zzd1++)
+                    {
+
+                        string _KLUCZ = lista_rekordowplikudocelowego[zzd1].Klucz;
+                        string _STRING = lista_rekordowplikudocelowego[zzd1].String;
+
+                        finalnyplikJSON_sw.Write("    \"" + _KLUCZ + "\": \"" + _STRING + "\"");
+
+                        if (zzd1 + 1 != lista_rekordowplikudocelowego.Count())
+                        {
+                            finalnyplikJSON_sw.Write(",");
+                        }
+
+                        finalnyplikJSON_sw.Write("\n");
+
+                    }
+
+
+                    finalnyplikJSON_sw.Close();
+
+
+
+                }
+                catch (Exception Error)
+                {
+
+                    string komunikat_obledzie;
+                    komunikat_obledzie = "BŁĄD: Wystąpił nieoczekiwany wyjątek w dostępie do plików #1 (Error: " + Error + ")!";
+
+                    if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1)
+                    {
+                        int makro_numeroperacjiwkolejnosci = makro_aktualny_indeks_listy + 1;
+
+                        makro_bledy_lista.Add(makro_numeroperacjiwkolejnosci + ";" + komunikat_obledzie);
+
+                    }
+
+                }
+
+
+                finalnyplikJSON_fs.Close();
+
+                bool stopkaJSON_rezultat = UtworzStopkeJSON(nazwafinalnegoplikuJSON);
+
+                if (stopkaJSON_rezultat == true)
+                {
+                    makro_pomyslnezakonczenieoperacjinr101 = true;
+
+                    Sukces("Plik JSON o nazwie \"" + nazwafinalnegoplikuJSON + "\" zostal wygenerowany.");
+
+                }
+
+
+
+            }
+            else
+            {
+                for (int e1 = 0; e1 < lista_brakujacychplikow.Count(); e1++)
+                {
+                    Blad("Brak wymaganego pliku o nazwie \"" + lista_brakujacychplikow[e1] + "\".");
+
+                }
+
+
+            }
+
+            Console.WriteLine("Kliknij ENTER aby zakończyć działanie programu.");
+            Console.ReadKey();
+
+
+        }
 
         public static void TworzenieStrukturyPlikowLokalizacji_WeryfikacjaPlikowUpdateLocStruct()
         {
@@ -3230,7 +3487,7 @@ namespace PWRlangConverter
 
                         Sukces("Struktura lokalizacji została pomyślnie zapisana w Folderze JSON o nazwie \"" + NOWYfolderlokalizacji_nazwa + "\".");
 
-                        makro_pomyslnezakonczenieoperacjinr101 = true;
+                        makro_pomyslnezakonczenieoperacjinr200 = true;
 
                         /*
                         // test dodawania danych do listy i sortowania - POCZĄTEK
@@ -3515,7 +3772,7 @@ namespace PWRlangConverter
 
 
 
-            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1 && makro_pomyslnezakonczenieoperacjinr101 == true)
+            if (makro_aktywowane == true && int.Parse(cfg.autoWprowadzanieNazwPlikowWejsciowych) == 1 && makro_pomyslnezakonczenieoperacjinr200 == true)
             {
                 
                 //czyszczenie pamięci dodatkowej jeśli makro jest aktywne
