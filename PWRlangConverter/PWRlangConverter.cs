@@ -86,7 +86,7 @@ namespace PWRlangConverter
 
     class PWRlangConverter
     {
-        readonly static string _PWR_naglowek = "PWRlangConverter v.2.00 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangConverter v.2.01 by Revok (2022)";
 
         readonly static bool wl_pasekpostepu = false; //!!!wlaczenie tej opcji znacznie wydłuża wykonywanie operacji!!!
         const string skrypt = "PWRlangConverter.cs";
@@ -1708,9 +1708,10 @@ namespace PWRlangConverter
                                                )
                                            )
                                         {
-
-                                            plikstringstxt_trescuaktualnionalinii = "<size=" + wielkiznakPL_rozmiar + "%>" + plikstringstxt_trescuaktualnionalinii + "</size>";
-
+                                            if (plikstringstxt_trescuaktualnionalinii.Contains("<size=") == false || (wielkiznakPL_rozmiar != 100))
+                                            {
+                                                plikstringstxt_trescuaktualnionalinii = "<size=" + wielkiznakPL_rozmiar + "%>" + plikstringstxt_trescuaktualnionalinii + "</size>";
+                                            }
                                         }
                                         else
                                         {
