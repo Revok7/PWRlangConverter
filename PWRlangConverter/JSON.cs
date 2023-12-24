@@ -14,20 +14,17 @@ using System.Xml.Serialization;
 
 using System.Text.RegularExpressions;
 
-namespace PWRlangConverter
+namespace JSON
 {
-
-    public class JSON
+    public static class NET6
     {
-        const string skrypt = "JSON.cs";
-
-        //v1 - nie wymaga deklarowania klasy ze schematem danych
+        //v1 - nie wymaga deklarowania klas ze schematem danych
         /* zwraca: dynamic[0]=lista stalych (gdzie lista stałych[indeks_stalej]=nazwa stałej) i dynamic[1]=lista wartości (gdzie lista wartości[indeks_stalej][indeks_wartosci]=wartość stałej) */
         public static dynamic[] WczytajStaleIIchWartosciZPlikuJSON_v1(string nazwa_pliku_JSON)
         {
             List<dynamic> lista_stalych = new List<dynamic>();
             List<List<dynamic>> lista_wartosci = new List<List<dynamic>>();
-            
+
 
             if (File.Exists(nazwa_pliku_JSON) == true)
             {
@@ -184,20 +181,20 @@ namespace PWRlangConverter
 
         }
 
-        //v2 - wymaga zadeklarowania klasy ze schematem danych
-        public static dynamic WczytajStaleIIchWartosciZPlikuJSON_v2(string nazwa_pliku_JSON)
+        //v2 - WYMAGA zadeklarowania klas ze schematem danych
+        //(automatyczny import klas możliwy jako wklejenie treści pliku JSON w VS2022: "Edycja/Wklej specjalne/Wklej dane JSON jako klasy")
+        public static dynamic WczytajStaleIIchWartosciZPlikuJSON_v2<Nazwa_klasy>(string nazwa_pliku_JSON)
         {
-            List<dynamic> lista_stalych = new List<dynamic>();
-            List<List<dynamic>> lista_wartosci = new List<List<dynamic>>();
 
             if (File.Exists(nazwa_pliku_JSON) == true)
             {
-                string konfiguracja_wczytanyplik = File.ReadAllText(nazwa_pliku_JSON);
-                konfiguracja cfg = JsonSerializer.Deserialize<konfiguracja>(konfiguracja_wczytanyplik);
+                string wczytanyplik_JSON = File.ReadAllText(nazwa_pliku_JSON);
+                Nazwa_klasy dane = JsonSerializer.Deserialize<Nazwa_klasy>(wczytanyplik_JSON);
 
-                return cfg;
+                return dane;
 
-            }else
+            }
+            else
             {
                 return null;
             }
@@ -206,5 +203,38 @@ namespace PWRlangConverter
 
     }
 
+    public static class NET8
+    {
+        //V3 - WYMAGA zadeklarowania klas ze schematem danych
+        //(automatyczny import klas możliwy jako wklejenie treści pliku JSON w VS2022: "Edycja/Wklej specjalne/Wklej dane JSON jako klasy")
+        public static dynamic WczytajDaneZPlikuJSON_v3<Nazwa_klasy>(string nazwa_pliku_JSON)
+        {
+            dynamic dane;
 
+            if (File.Exists(nazwa_pliku_JSON) == true)
+            {
+                string wczytanyplik_json = File.ReadAllText(nazwa_pliku_JSON);
+
+                if (wczytanyplik_json != null)
+                {
+                    dane = JsonSerializer.Deserialize<Nazwa_klasy>(wczytanyplik_json);
+                }
+                else
+                {
+                    dane = "NULL";
+                    //Console.WriteLine("[DEBUG] BŁĄD: Wczytany plik JSON który wskazano jest pusty.");
+                }
+
+            }
+            else
+            {
+                dane = "NULL";
+                //Console.WriteLine("[DEBUG] BŁĄD: Plik JSON który wskazano nie istnieje.");
+            }
+
+            return dane;
+
+        }
+
+    }
 }

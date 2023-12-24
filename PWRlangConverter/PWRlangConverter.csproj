@@ -10,10 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="6.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="Goblinfactory.ProgressBar.moddedbyRevok">
       <HintPath>..\biblioteki\Goblinfactory.ProgressBar.moddedbyRevok.dll</HintPath>
     </Reference>

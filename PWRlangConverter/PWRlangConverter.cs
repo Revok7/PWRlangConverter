@@ -86,7 +86,7 @@ namespace PWRlangConverter
 
     class PWRlangConverter
     {
-        readonly static string _PWR_naglowek = "PWRlangConverter v.2.03 by Revok (2022)";
+        readonly static string _PWR_naglowek = "PWRlangConverter v.2.04 by Revok (2023)";
 
         readonly static bool wl_pasekpostepu = false; //!!!wlaczenie tej opcji znacznie wydłuża wykonywanie operacji!!!
         const string skrypt = "PWRlangConverter.cs";
@@ -2430,10 +2430,10 @@ namespace PWRlangConverter
 
                     tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe_oznaczenieaktualizacji = oznaczenie_aktualizacji;
 
-                    dynamic[] _Schemat_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateSchemaJSON_nazwa);
-                    dynamic[] _StrukturaLokalizacji_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateLocStructJSON_nazwa);
-                    dynamic[] _PlikLokalizacjiStarejWersji_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(pliklokalizacjistarejwersji_nazwa);
-                    dynamic[] _PlikLokalizacjiZAktualizacjaDoNowejWersji_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(pliklokalizacjizaktualizacjadonowejwersji_nazwa);
+                    dynamic[] _Schemat_tablicalistdanych = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateSchemaJSON_nazwa);
+                    dynamic[] _StrukturaLokalizacji_tablicalistdanych = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateLocStructJSON_nazwa);
+                    dynamic[] _PlikLokalizacjiStarejWersji_tablicalistdanych = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(pliklokalizacjistarejwersji_nazwa);
+                    dynamic[] _PlikLokalizacjiZAktualizacjaDoNowejWersji_tablicalistdanych = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(pliklokalizacjizaktualizacjadonowejwersji_nazwa);
 
                     tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__Schemat_tablicalistdanych = _Schemat_tablicalistdanych;
                     tmpdlawatkow_WdrazanieAktualizacji_Wielowatkowe__StrukturaLokalizacji_tablicalistdanych = _StrukturaLokalizacji_tablicalistdanych;
@@ -3058,7 +3058,7 @@ namespace PWRlangConverter
 
                     List<Rekord> danezplikuJSON_listarekordow = new List<Rekord>();
 
-                    dynamic[] danezplikuJSON_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(lista_wymaganychplikowUPDATE[i2]);
+                    dynamic[] danezplikuJSON_tablicalistdanych = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(lista_wymaganychplikowUPDATE[i2]);
 
                     List<dynamic> danezplikuJSON_listakluczy = danezplikuJSON_tablicalistdanych[0];
                     List<List<dynamic>> danezplikuJSON_listastringow = danezplikuJSON_tablicalistdanych[1];
@@ -3103,7 +3103,7 @@ namespace PWRlangConverter
                 tmpdlawatkow_ZbiorczeWdrazanieAktualizacji_Wielowatkowe_listaplikowUPDATE_listarekordow = listaplikowUPDATE_listarekordow;
 
 
-                dynamic[] _SchematLokalizacjiWersjiDocelowej = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateSchemaJSONwersjidocelowej_nazwa);
+                dynamic[] _SchematLokalizacjiWersjiDocelowej = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateSchemaJSONwersjidocelowej_nazwa);
                 List<dynamic> _SchematLokalizacjiWersjiDocelowej_listakluczy = _SchematLokalizacjiWersjiDocelowej[0];
 
                 tmpdlawatkow_ZbiorczeWdrazanieAktualizacji_Wielowatkowe__SchematLokalizacjiWersjiDocelowej_listakluczy = _SchematLokalizacjiWersjiDocelowej_listakluczy;
@@ -3714,8 +3714,8 @@ namespace PWRlangConverter
                         Console.WriteLine("Trwa segregowanie danych przed właściwym tworzeniem struktury lokalizacji...");
                         Console.WriteLine("Proszę czekać...");
 
-                        dynamic[] _StrukturaLokalizacji_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateLocStructJSON_nazwa);
-                        dynamic[] _BazaDlaStruktury_tablicalistdanych = JSON.WczytajStaleIIchWartosciZPlikuJSON_v1(plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa);
+                        dynamic[] _StrukturaLokalizacji_tablicalistdanych = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(folderupdate + "//" + plikUpdateLocStructJSON_nazwa);
+                        dynamic[] _BazaDlaStruktury_tablicalistdanych = JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v1(plikJSONlokalizacji_bazadoutworzeniastruktury_nazwa);
 
                         List<dynamic> _StrukturaLokalizacji_listakluczy = _StrukturaLokalizacji_tablicalistdanych[0];
                         List<dynamic> _BazaDlaStruktury_listakluczy = _BazaDlaStruktury_tablicalistdanych[0];

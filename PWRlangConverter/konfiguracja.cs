@@ -74,7 +74,7 @@ namespace PWRlangConverter
 
             if (File.Exists("cfg.json") == true)
             {
-                return JSON.WczytajStaleIIchWartosciZPlikuJSON_v2("cfg.json");
+                return JSON.NET6.WczytajStaleIIchWartosciZPlikuJSON_v2<konfiguracja>("cfg.json");
             }
             else
             {
